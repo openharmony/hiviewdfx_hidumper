@@ -240,6 +240,7 @@ inline const std::map<int, std::string> saNameMap_ = {
     { SELECTION_FWK_SA_ID, "SelectionService" },
     { MECH_BODY_SA_ID, "MechBodyController" },
     { XPERF_SERVICE_SA_ID, "XperfService" },
+    { FUSION_CONN_SYS_ABILITY_ID, "PartnerDeviceAgent" },
 };
 
 namespace HiviewDFX {
