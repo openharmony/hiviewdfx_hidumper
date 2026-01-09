@@ -151,7 +151,7 @@ The procedure is as follows:
     hidumper --cpufreq
     ```
 
-16. Run the **hidumper --mem [pid] [--prune] [--show-ashmem] [--show-dmabuf]** command to obtain all memory usage information of the process whose PID has been specified; If --prune is specified, export simplified memory infomation quickly; By specified the specific PID and time, the memory change information of PID can be printed out.If the --show-ashmem option is specified, detailed information regarding ashmem usage will be appended to the output. For application processes, when the --show-dmabuf flag is enabled, comprehensive details pertaining to DMA memory will be additionally printed.
+16. Run the **hidumper --mem [pid] [--prune] [--show-ashmem] [--show-dmabuf]** command to obtain all memory usage information of the process whose PID has been specified; If --prune is specified, export simplified memory information quickly; By specified the specific PID and time, the memory change information of PID can be printed out.If the --show-ashmem option is specified, detailed information regarding ashmem usage will be appended to the output. For application processes, when the --show-dmabuf flag is enabled, comprehensive details pertaining to DMA memory will be additionally printed.
 
     ```
     hidumper --mem
