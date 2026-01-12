@@ -110,6 +110,8 @@ private:
     DumpStatus SetMemPruneParam(DumperOpts &opt);
     DumpStatus SetGCParam(DumperOpts &opt);
     DumpStatus SetEventParam(DumperOpts &opts, const std::string& param);
+    void SetZipTitle(const std::shared_ptr<HidumperExecutor>& executor,
+        const std::shared_ptr<DumperParameter>& dumpParameter);
     DumpStatus CheckArgs(int argc, char* argv[]);
     bool IsNewStructSupport(std::shared_ptr<DumperParameter> ptrDumperParameter);
 
