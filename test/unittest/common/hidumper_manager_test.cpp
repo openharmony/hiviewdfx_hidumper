@@ -469,7 +469,7 @@ HWTEST_F(HiDumperManagerTest, DumpTest020, TestSize.Level0)
 
 /**
  * @tc.name: MemoryDumperTest023
- * @tc.desc: Test for all infomation.
+ * @tc.desc: Test for all information.
  * @tc.type: FUNC
  */
 HWTEST_F(HiDumperManagerTest, DumpTest023, TestSize.Level0)
