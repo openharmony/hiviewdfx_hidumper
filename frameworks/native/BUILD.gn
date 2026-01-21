@@ -276,6 +276,12 @@ ohos_executable("hidumper") {
     "samgr:samgr_proxy",
   ]
 
+  if (hidumper_feature_support_usr_symlink) {
+    symlink_target_name = [
+      "../usr/bin/hidumper",
+    ]
+  }
+
   subsystem_name = "hiviewdfx"
 
   part_name = "hidumper"
