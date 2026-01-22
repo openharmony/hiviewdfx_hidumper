@@ -78,10 +78,10 @@ struct DumperSysEventParams {
 };
 
 
-const std::string LOG_DEFAULT = "log.txt";
-const std::string ZIP_FILEEXT = "zip";
-const std::string ZIP_FOLDER = "/data/log/hidumper/";
-const std::string HISYSEVENT_TMP_FILE = "/data/log/hidumper/hisysevent.tmp";
+inline const std::string LOG_DEFAULT = "log.txt";
+inline const std::string ZIP_FILEEXT = "zip";
+inline const std::string ZIP_FOLDER = "/data/log/hidumper/";
+inline const std::string HISYSEVENT_TMP_FILE = "/data/log/hidumper/hisysevent.tmp";
 
 const std::string RELEASE_MODE = "Release";
 } // namespace HiviewDFX

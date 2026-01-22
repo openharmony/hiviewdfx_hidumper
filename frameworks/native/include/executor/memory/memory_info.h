@@ -30,22 +30,22 @@
 namespace OHOS {
 namespace HiviewDFX {
 namespace {
-static const std::string MEMINFO_PSS = "Pss";
-static const std::string MEMINFO_SHARED_CLEAN = "Shared_Clean";
-static const std::string MEMINFO_SHARED_DIRTY = "Shared_Dirty";
-static const std::string MEMINFO_PRIVATE_CLEAN = "Private_Clean";
-static const std::string MEMINFO_PRIVATE_DIRTY = "Private_Dirty";
-static const std::string MEMINFO_SWAP = "Swap";
-static const std::string MEMINFO_SWAP_PSS = "SwapPss";
-static const std::string MEMINFO_HEAP_SIZE = "Heap_Size";
-static const std::string MEMINFO_HEAP_ALLOC = "Heap_Alloc";
-static const std::string MEMINFO_HEAP_FREE = "Heap_Free";
-static const std::string MEMINFO_DMA = "Dma";
-static const std::string MEMINFO_OTHER = "other";
-static const std::string MEMINFO_ANONPAGE_OTHER = "AnonPage other";
-static const std::string MEMINFO_FILEPAGE_OTHER = "FilePage other";
-static const std::string MEMINFO_ASHMEM = "Ashmem";
-static const std::string MEMINFO_TOTAL = "Total";
+inline static const std::string MEMINFO_PSS = "Pss";
+inline static const std::string MEMINFO_SHARED_CLEAN = "Shared_Clean";
+inline static const std::string MEMINFO_SHARED_DIRTY = "Shared_Dirty";
+inline static const std::string MEMINFO_PRIVATE_CLEAN = "Private_Clean";
+inline static const std::string MEMINFO_PRIVATE_DIRTY = "Private_Dirty";
+inline static const std::string MEMINFO_SWAP = "Swap";
+inline static const std::string MEMINFO_SWAP_PSS = "SwapPss";
+inline static const std::string MEMINFO_HEAP_SIZE = "Heap_Size";
+inline static const std::string MEMINFO_HEAP_ALLOC = "Heap_Alloc";
+inline static const std::string MEMINFO_HEAP_FREE = "Heap_Free";
+inline static const std::string MEMINFO_DMA = "Dma";
+inline static const std::string MEMINFO_OTHER = "other";
+inline static const std::string MEMINFO_ANONPAGE_OTHER = "AnonPage other";
+inline static const std::string MEMINFO_FILEPAGE_OTHER = "FilePage other";
+inline static const std::string MEMINFO_ASHMEM = "Ashmem";
+inline static const std::string MEMINFO_TOTAL = "Total";
 }
 class MemoryInfo {
 public:
