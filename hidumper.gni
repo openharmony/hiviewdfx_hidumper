@@ -67,4 +67,5 @@ declare_args() {
       defined(global_parts_info.resourceschedule_memmgr_override)) {
     hidumper_report_memmgr = true
   }
+  hidumper_feature_support_usr_symlink = false
 }
