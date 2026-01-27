@@ -900,11 +900,13 @@ DumpStatus DumpImplement::DumpDatas(const std::vector<std::shared_ptr<HidumperEx
         DumpStatus ret = DumpStatus::DUMP_FAIL;
         ret = executors[index]->DoPreExecute(dumpParameter, dumpDatas);
         if (ret != DumpStatus::DUMP_OK) {
+            SetZipTitle(executors[index], dumpParameter);
             continue;
         }
 
         ret = executors[index]->DoExecute();
         if ((ret != DumpStatus::DUMP_OK) && (ret != DumpStatus::DUMP_MORE_DATA)) {
+            SetZipTitle(executors[index], dumpParameter);
             continue;
         }
 
@@ -925,6 +927,16 @@ DumpStatus DumpImplement::DumpDatas(const std::vector<std::shared_ptr<HidumperEx
     }
     callback->UpdateProgress(executors.size(), executors.size());
     return DumpStatus::DUMP_OK;
+}
+
+void DumpImplement::SetZipTitle(const std::shared_ptr<HidumperExecutor> &executor,
+                                const std::shared_ptr<DumperParameter> &dumpParameter)
+{
+    if (executor->GetDumpConfig()->class_ == DumperConstant::FD_OUTPUT &&
+        dumpParameter->GetOpts().IsDumpZip()) {
+        dumpParameter->getClientCallback()->SetTitle(",Failed to create the file.");
+        DUMPER_HILOGE(MODULE_COMMON, "Zip output failed.");
+    }
 }
 
 void DumpImplement::AddGroupTitle(const std::string &groupName, HidumperExecutor::StringMatrix dumpDatas,
