@@ -13,6 +13,9 @@
         "name": "hidumper",
         "subsystem": "hiviewdfx",
         "syscap": [],
+        "features": [
+            "hidumper_feature_support_usr_symlink"
+        ],
         "adapted_system_type": [
             "standard"
         ],
