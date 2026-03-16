@@ -142,6 +142,7 @@ inline const std::map<int, std::string> saNameMap_ = {
     { INPUT_METHOD_SYSTEM_ABILITY_ID, "InputMethodService" },
     { MEDICAL_SENSOR_SERVICE_ABILITY_ID, "MedicalSensorService" },
     { USB_SYSTEM_ABILITY_ID, "UsbService" },
+    { SERIAL_SYSTEM_ABILITY_ID, "SerialService" },
     { STORAGE_MANAGER_DAEMON_ID, "StorageDaemon" },
     { STORAGE_MANAGER_MANAGER_ID, "StorageManager"},
     { FILEMANAGEMENT_DISTRIBUTED_FILE_DAEMON_SA_ID, "DistributedFileDaemon"},
