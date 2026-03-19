@@ -16,6 +16,7 @@
 #include <dirent.h>
 #include <unistd.h>
 #include "dump_utils.h"
+#include "dump_common_tag.h"
 
 namespace OHOS {
 namespace HiviewDFX {
@@ -83,7 +84,7 @@ int FileStreamDumper::OpenNextFile()
         return -1;
     }
     if ((fp_ = fdopen(fd_, "r")) == nullptr) {
-        close(fd_);
+        fdsan_close_with_tag(fd_, FDTAG);
         fd_ = -1;
         return -1;
     }
@@ -255,7 +256,7 @@ void FileStreamDumper::CloseFd()
         fp_ = nullptr;
         fd_ = -1;
     } else if (fd_ >= 0) {
-        close(fd_);
+        fdsan_close_with_tag(fd_, FDTAG);
         fd_ = -1;
     }
 };

@@ -20,6 +20,7 @@
 #include "hilog_wrapper.h"
 #include "util/zip_utils.h"
 #include "dump_common_utils.h"
+#include "dump_common_tag.h"
 namespace OHOS {
 namespace HiviewDFX {
 namespace {
@@ -37,7 +38,7 @@ ZipFolderOutput::~ZipFolderOutput()
     DUMPER_HILOGD(MODULE_COMMON, "release|");
 
     if (fd_ > FD_UNSET) {
-        close(fd_);
+        fdsan_close_with_tag(fd_, FDTAG);
     }
 
     fd_ = FD_UNSET;
@@ -119,7 +120,7 @@ void ZipFolderOutput::Reset()
 {
     if (fd_ > FD_UNSET) {
         DUMPER_HILOGD(MODULE_COMMON, "Reset debug|close");
-        close(fd_);
+        fdsan_close_with_tag(fd_, FDTAG);
     }
     fd_ = FD_UNSET;
 
