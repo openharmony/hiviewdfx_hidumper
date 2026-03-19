@@ -28,7 +28,7 @@ FDOutput::FDOutput() : fd_(-1)
 FDOutput::~FDOutput()
 {
     if (fd_ >= 0) {
-        close(fd_);
+        fdsan_close_with_tag(fd_, FDTAG);
     }
     fd_ = -1;
 }

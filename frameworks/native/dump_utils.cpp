@@ -46,6 +46,7 @@
 #ifdef HIDUMPER_BUNDLEMANAGER_FRAMEWORK_ENABLE
 #include "application_info.h"
 #include "bundlemgr/bundle_mgr_proxy.h"
+#include "dump_common_tag.h"
 #endif
 
 namespace OHOS {
@@ -268,7 +269,7 @@ void DumpUtils::SetAdj(int adj)
         return;
     }
     dprintf(fd, "%d", adj);
-    close(fd);
+    fdsan_close_with_tag(fd, FDTAG);
 }
 
 void DumpUtils::BoostPriority()

@@ -47,6 +47,7 @@
 #include "string_ex.h"
 #include "util/string_utils.h"
 #include "util/file_utils.h"
+#include "dump_common_tag.h"
 
 using namespace std;
 using namespace OHOS::HDI::Memorytracker::V1_0;
