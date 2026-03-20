@@ -36,7 +36,7 @@
 #include "token_setproc.h"
 #include "accesstoken_kit.h"
 #include "system_ability_ondemand_reason.h"
-#include "common/dump_common_tag.h"
+#include "common/dumper_constant.h"
 
 using namespace std;
 namespace OHOS {

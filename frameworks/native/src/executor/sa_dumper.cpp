@@ -21,7 +21,7 @@
 #include "dump_utils.h"
 #include "file_ex.h"
 #include "securec.h"
-#include "common/dump_common_tag.h"
+#include "common/dumper_constant.h"
 
 namespace OHOS {
 namespace HiviewDFX {

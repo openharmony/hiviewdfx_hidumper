@@ -18,7 +18,6 @@
 #include "dump_utils.h"
 #include "util/file_utils.h"
 #include "common/dumper_constant.h"
-#include "common/dump_common_tag.h"
 namespace OHOS {
 namespace HiviewDFX {
 ZipOutput::ZipOutput() : fd_(-1)

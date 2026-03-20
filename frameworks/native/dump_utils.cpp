@@ -46,7 +46,7 @@
 #ifdef HIDUMPER_BUNDLEMANAGER_FRAMEWORK_ENABLE
 #include "application_info.h"
 #include "bundlemgr/bundle_mgr_proxy.h"
-#include "common/dump_common_tag.h"
+#include "common/dumper_constant.h"
 #endif
 
 namespace OHOS {
