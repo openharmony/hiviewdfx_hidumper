@@ -461,7 +461,7 @@ void MemoryInfo::RedirectMemoryInfo(int timeIndex, StringMatrix result)
             }
         }
     }
-    close(redirectFd);
+    fdsan_close_with_tag(redirectFd, FDTAG);
 }
 
 void MemoryInfo::GetMemoryInfoByTimeInterval(int fd, const int32_t &pid, const int32_t &timeInterval)
