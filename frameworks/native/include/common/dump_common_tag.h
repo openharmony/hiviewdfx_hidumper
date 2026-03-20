@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
- #ifndef DUMP_COMMON_TAG_H
- #define DUMP_COMMON_TAG_H
+#ifndef DUMP_COMMON_TAG_H
+#define DUMP_COMMON_TAG_H
 
- const unit64_t FDTAG = 0xD002D20
+const unit64_t FDTAG = 0xD002D20
 
- #endif
+#endif
