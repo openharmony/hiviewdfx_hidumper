@@ -19,7 +19,6 @@
 #include <vector>
 #include <iostream>
 #include <memory>
-#include <android/fdsan.h>
 
 namespace OHOS {
 namespace HiviewDFX {
