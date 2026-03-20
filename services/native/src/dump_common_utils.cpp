@@ -27,7 +27,7 @@
 #include "sys/stat.h"
 #include "util/string_utils.h"
 #include "util/file_utils.h"
-#include "dump_common_tag.h"
+#include "common/dump_common_tag.h"
 
 using namespace std;
 namespace OHOS {
