@@ -20,7 +20,7 @@
 #include "hilog_wrapper.h"
 #include "util/zip_utils.h"
 #include "dump_common_utils.h"
-#include "common/dump_common_tag.h"
+#include "common/dumper_constant.h"
 namespace OHOS {
 namespace HiviewDFX {
 namespace {

@@ -16,7 +16,7 @@
 #include "executor/fd_output.h"
 #include <unistd.h>
 #include <fcntl.h>
-#include "common/dump_common_tag.h"
+#include "common/dumper_constant.h"
 
 namespace OHOS {
 namespace HiviewDFX {
