@@ -268,6 +268,7 @@ void DumpUtils::SetAdj(int adj)
     if (fd < 0) {
         return;
     }
+    fdsan_exchange_owner_tag(fd, 0, new_tag);
     dprintf(fd, "%d", adj);
     fdsan_close_with_tag(fd, FDTAG);
 }

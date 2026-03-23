@@ -137,6 +137,7 @@ int32_t DumpManagerService::Dump(int32_t fd, const std::vector<std::u16string> &
 void DumpManagerService::HandleRequestError(std::vector<std::u16string> &args, int outfd,
     const int32_t& errorCode, const std::string& errorMsg)
 {
+    fdsan_exchange_owner_tag(outfd, 0, new_tag);
     fdsan_close_with_tag(outfd, FDTAG);
     int callerPpid = -1;
     if (args.size() >= ARG_MIN_COUNT) {

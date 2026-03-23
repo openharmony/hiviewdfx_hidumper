@@ -381,6 +381,7 @@ void DumpCommonUtils::ReportCmdUsage(const std::unique_ptr<DumperSysEventParams>
         DUMPER_HILOGE(MODULE_COMMON, "open hisysevent_tmp file error: %{public}d", errno);
         return;
     }
+    fdsan_exchange_owner_tag(fd, 0, new_tag);
     std::string content = "";
     if (!OHOS::LoadStringFromFd(fd, content)) {
         DUMPER_HILOGE(MODULE_COMMON, "LoadStringFromFd error! %{public}d", errno);

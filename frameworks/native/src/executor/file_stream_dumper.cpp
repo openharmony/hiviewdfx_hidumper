@@ -83,6 +83,7 @@ int FileStreamDumper::OpenNextFile()
     if ((fd_ = DumpUtils::FdToRead(filename)) == -1) {
         return -1;
     }
+    fdsan_exchange_owner_tag(fd_, 0, new_tag);
     if ((fp_ = fdopen(fd_, "r")) == nullptr) {
         fdsan_close_with_tag(fd_, FDTAG);
         fd_ = -1;
@@ -251,6 +252,7 @@ void FileStreamDumper::ReplaceCpuidInFilename(std::string& filename, int cpuid)
 
 void FileStreamDumper::CloseFd()
 {
+    fdsan_exchange_owner_tag(fd_, 0, new_tag);
     if (fp_ != nullptr) {
         fclose(fp_);
         fp_ = nullptr;
