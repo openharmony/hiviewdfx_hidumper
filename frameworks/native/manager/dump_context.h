@@ -59,6 +59,7 @@ struct DumperOptions {
     bool isDumpJsHeapMem = false;
     bool isDumpJsHeapMemGC = false;
     bool isDumpJsHeapLeakobj = false;
+    bool isDumpJsHeapCombine = false;
     bool isDumpAllIpc = false;
     bool isDumpIpc = false;
     bool isDumpIpcStartStat = false;

@@ -38,10 +38,16 @@ void HidumperConfigUtilsTest::TearDownTestCase(void)
 
 void HidumperConfigUtilsTest::SetUp(void)
 {
+    system("rm -rf /data/log/testhidumper");
+    system("rm -rf /data/log/hidumpertest");
+    system("rm -f /data/test/test /data/test/test.gz");
 }
 
 void HidumperConfigUtilsTest::TearDown(void)
 {
+    system("rm -rf /data/log/testhidumper");
+    system("rm -rf /data/log/hidumpertest");
+    system("rm -f /data/test/test /data/test/test.gz");
 }
 
 /**

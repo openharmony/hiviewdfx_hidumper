@@ -51,6 +51,7 @@ static struct option LONG_OPTIONS[] = {
     {"gc", no_argument, 0, 0},
     {"leakobj", no_argument, 0, 0},
     {"raw", no_argument, 0, 0},
+    {"single", no_argument, 0, 0},
     {"ipc", optional_argument, 0, 0},
     {"start-stat", no_argument, 0, 0},
     {"stop-stat", no_argument, 0, 0},
@@ -87,7 +88,7 @@ void PrintHelpInfo(DumpContext& dumpContext)
         " detail information is stored in /data/log/hidumper/record_mem.txt.\n"
         "  --zip                       |compress output to /data/log/hidumper\n"
         "  --mem-smaps pid [-v]        |display statistic in /proc/pid/smaps, use -v specify more details\n"
-        "  --mem-jsheap pid [-T tid] [--gc] [--leakobj] [--raw]  |triggerGC, dumpHeapSnapshot, dumpRawHeap"
+        "  --mem-jsheap pid [-T tid] [--gc] [--leakobj] [--raw] [--single]  |triggerGC, dumpHeapSnapshot, dumpRawHeap"
         " and dumpLeakList under pid and tid\n"
         "  --mem-cjheap pid [--gc]     |the pid should belong to the Cangjie process; triggerGC and"
         " dumpHeapSnapshot under pid\n"
@@ -240,6 +241,8 @@ DumpStatus CmdParse::ParseLongCmdOption(int argc, DumpContext& dumpContext,
         dumpContext.GetDumperOpts()->isDumpJsHeapMemGC = true;
     } else if (optionName == "leakobj") {
         dumpContext.GetDumperOpts()->isDumpJsHeapLeakobj = true;
+    } else if (optionName == "single") {
+        return SetHeapCombineParam(dumpContext);
     } else if (optionName == "ipc") {
         dumpContext.GetDumperOpts()->isDumpIpc = true;
         if (argc != IPC_STAT_ARG_NUMS) {
@@ -522,6 +525,21 @@ DumpStatus CmdParse::VerifyOptions(const DumpContext& dumpContext)
             return DumpStatus::DUMP_FAIL;
         }
     }
+    return DumpStatus::DUMP_OK;
+}
+
+DumpStatus CmdParse::SetHeapCombineParam(DumpContext& dumpContext)
+{
+    if (!dumpContext.GetDumperOpts()->dumpJsRawHeap) {
+        DUMPER_HILOGE(MODULE_COMMON, "'--single' only used with '--raw'.");
+        return DumpStatus::DUMP_FAIL;
+    }
+    if (dumpContext.GetDumperOpts()->threadId != 0 &&
+        dumpContext.GetDumperOpts()->threadId != dumpContext.GetDumperOpts()->dumpJsHeapMemPid) {
+        DUMPER_HILOGE(MODULE_COMMON, "mem-jsheap param err, '--single' not need tid.");
+        return DumpStatus::DUMP_FAIL;
+    }
+    dumpContext.GetDumperOpts()->isDumpJsHeapCombine = true;
     return DumpStatus::DUMP_OK;
 }
 } // namespace HiviewDFX
