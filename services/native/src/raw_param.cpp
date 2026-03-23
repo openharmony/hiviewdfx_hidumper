@@ -81,6 +81,7 @@ int &RawParam::GetOutputFd()
 void RawParam::CloseOutputFd()
 {
     DUMPER_HILOGD(MODULE_SERVICE, "enter|outfd=%{public}d", outfd_);
+    fdsan_exchange_owner_tag(outfd_, 0, new_tag);
     if (outfd_ > -1) {
         DUMPER_HILOGD(MODULE_SERVICE, "debug|outfd=%{public}d", outfd_);
         fdsan_close_with_tag(outfd_, FDTAG);
