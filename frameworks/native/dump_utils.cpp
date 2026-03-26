@@ -304,6 +304,7 @@ int DumpUtils::FdToRead(const std::string &file)
     }
 
     int fd = TEMP_FAILURE_RETRY(open(path, O_RDONLY | O_CLOEXEC | O_NONBLOCK));
+    fdsan_exchange_owner_tag(fd, 0, FDTAG);
     if (fd == -1) {
         DUMPER_HILOGE(MODULE_COMMON, "open [%{public}s] %{public}s", path, ErrnoToMsg(errno).c_str());
     }
@@ -327,12 +328,14 @@ int DumpUtils::FdToWrite(const std::string &file)
         int fd = -1;
         if (access(fileName.c_str(), F_OK) == 0) {
             fd = open(fileName.c_str(), O_WRONLY);
+            fdsan_exchange_owner_tag(fd, 0, FDTAG);
             if (lseek(fd, 0, SEEK_END) == -1) {
                 DUMPER_HILOGE(MODULE_COMMON, "lseek fail fd:%{public}d, errno:%{public}d", fd, errno);
             }
         } else {
             fd = TEMP_FAILURE_RETRY(open(fileName.c_str(), O_WRONLY | O_CREAT | O_CLOEXEC | O_NOFOLLOW,
                                          S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH));
+            fdsan_exchange_owner_tag(fd, 0, FDTAG);
         }
         if (fd == -1) {
             DUMPER_HILOGE(MODULE_COMMON, "open [%{public}s] %{public}s",
