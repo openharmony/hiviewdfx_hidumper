@@ -1107,6 +1107,34 @@ void DumpImplement::SendReleaseVersionErrorMessage(const std::string& opt)
     dprintf(rawParamFd, onlySupportDebugVersionAppMessage.c_str(), opt.c_str());
 }
 
+void DumpImplement::SendPermissionCheckErrorMessage(const std::string& opt, bool isProfileable,
+    bool isInhouse, bool isDeveloperMode)
+{
+    if (ptrReqCtl_ == nullptr) {
+        DUMPER_HILOGE(MODULE_COMMON, "ptrReqCtl_ == nullptr");
+        return;
+    }
+    int rawParamFd = ptrReqCtl_->GetOutputFd();
+    if (rawParamFd < 0) {
+        DUMPER_HILOGE(MODULE_COMMON, "rawParamFd < 0");
+        return;
+    }
+    std::string supportReleaseSignedAppMessage_ = "[Permission Check Failed]\n";
+    supportReleaseSignedAppMessage_ += "  The %s option needs a debug-signed application.\n";
+    supportReleaseSignedAppMessage_ +=
+        "  If release-signed application needs to meet all of the following conditions:\n";
+    supportReleaseSignedAppMessage_ += "  - profilerable-label: ";
+    supportReleaseSignedAppMessage_ += (isProfileable ? "satisfied" : "not satisfied");
+    supportReleaseSignedAppMessage_ += "\n";
+    supportReleaseSignedAppMessage_ += "  - enterprise-app-type: ";
+    supportReleaseSignedAppMessage_ += (isInhouse ? "satisfied" : "not satisfied");
+    supportReleaseSignedAppMessage_ += "\n";
+    supportReleaseSignedAppMessage_ += "  - developer mode: ";
+    supportReleaseSignedAppMessage_ += (isDeveloperMode ? "satisfied" : "not satisfied");
+    supportReleaseSignedAppMessage_ += "\n";
+    dprintf(rawParamFd, supportReleaseSignedAppMessage_.c_str(), opt.c_str());
+}
+
 std::string DumpImplement::RemoveCharacterFromStr(const std::string &str, const char character)
 {
     std::string strTmp = str;
@@ -1206,6 +1234,29 @@ void DumpImplement::ReportCjheap(const DumperOpts &opts)
 }
 #endif
 
+bool DumpImplement::CheckJsHeapPermission(int pid)
+{
+    bool isDebugVersion = DumpUtils::CheckAppDebugVersion(pid);
+    if (isDebugVersion) {
+        DUMPER_HILOGD(MODULE_COMMON, "JsHeapPermission success, is Debug Version");
+        return true;
+    }
+
+    bool isProfileable = DumpUtils::CheckAppProfileable(pid);
+    bool isInhouse = DumpUtils::CheckAppInhouse(pid);
+    bool isDeveloperMode = DumpUtils::IsDeveloperModeEnabled();
+    if (!isProfileable || !isInhouse || !isDeveloperMode) {
+        SendPermissionCheckErrorMessage("--mem-jsheap", isProfileable, isInhouse, isDeveloperMode);
+        DUMPER_HILOGE(MODULE_COMMON,
+            "JsHeapPermission failed, isProfileable=%{public}d isInhouse=%{public}d isDeveloperMode=%{public}d",
+            isProfileable, isInhouse, isDeveloperMode);
+        return false;
+    }
+    
+    DUMPER_HILOGD(MODULE_COMMON, "JsHeapPermission success, release version with profileable+inhouse+developerMode");
+    return true;
+}
+
 bool DumpImplement::CheckDumpPermission(DumperOpts& opt)
 {
     bool isUserMode = DumpUtils::IsUserMode();
@@ -1213,20 +1264,15 @@ bool DumpImplement::CheckDumpPermission(DumperOpts& opt)
     if (!isUserMode) {
         return true;
     }
-    // mem-smaps [-v] + releaseApp
     int uid = ptrReqCtl_->GetUid();
     if (opt.isShowSmaps_ && uid != HIVIEW_UID && !DumpUtils::CheckAppDebugVersion(opt.memPid_)) {
         SendReleaseAppErrorMessage("--mem-smaps");
         DUMPER_HILOGE(MODULE_COMMON, "ShowSmaps false, isUserMode:%{public}d, pid:%{public}d", isUserMode, opt.memPid_);
         return false;
     }
-    // mem-jsheap + releaseApp
-    if (opt.isDumpJsHeapMem_ && !DumpUtils::CheckAppDebugVersion(opt.dumpJsHeapMemPid_)) {
-        SendReleaseAppErrorMessage("--mem-jsheap");
-        DUMPER_HILOGE(MODULE_COMMON, "DumpJsHeapMem false isUserMode %{public}d", isUserMode);
+    if (opt.isDumpJsHeapMem_ && !CheckJsHeapPermission(opt.dumpJsHeapMemPid_)) {
         return false;
     }
-    // mem-cjheap + releaseApp
     if (opt.isDumpCjHeapMem_ && !DumpUtils::CheckAppDebugVersion(opt.dumpCjHeapMemPid_)) {
         SendReleaseAppErrorMessage("--mem-cjheap");
         DUMPER_HILOGE(MODULE_COMMON, "DumpCjHeapMem false isUserMode %{public}d", isUserMode);
