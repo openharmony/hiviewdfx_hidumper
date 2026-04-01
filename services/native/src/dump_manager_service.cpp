@@ -36,6 +36,7 @@
 #include "token_setproc.h"
 #include "accesstoken_kit.h"
 #include "system_ability_ondemand_reason.h"
+#include "common/dumper_constant.h"
 
 using namespace std;
 namespace OHOS {
@@ -136,7 +137,8 @@ int32_t DumpManagerService::Dump(int32_t fd, const std::vector<std::u16string> &
 void DumpManagerService::HandleRequestError(std::vector<std::u16string> &args, int outfd,
     const int32_t& errorCode, const std::string& errorMsg)
 {
-    close(outfd);
+    fdsan_exchange_owner_tag(outfd, 0, FDTAG);
+    fdsan_close_with_tag(outfd, FDTAG);
     int callerPpid = -1;
     if (args.size() >= ARG_MIN_COUNT) {
         StrToInt(Str16ToStr8(args[args.size() - 1]), callerPpid);

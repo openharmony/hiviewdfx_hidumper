@@ -16,6 +16,7 @@
 #include <dirent.h>
 #include <unistd.h>
 #include "dump_utils.h"
+#include "common/dumper_constant.h"
 
 namespace OHOS {
 namespace HiviewDFX {
@@ -82,8 +83,9 @@ int FileStreamDumper::OpenNextFile()
     if ((fd_ = DumpUtils::FdToRead(filename)) == -1) {
         return -1;
     }
+    fdsan_exchange_owner_tag(fd_, 0, FDTAG);
     if ((fp_ = fdopen(fd_, "r")) == nullptr) {
-        close(fd_);
+        fdsan_close_with_tag(fd_, FDTAG);
         fd_ = -1;
         return -1;
     }
@@ -250,12 +252,13 @@ void FileStreamDumper::ReplaceCpuidInFilename(std::string& filename, int cpuid)
 
 void FileStreamDumper::CloseFd()
 {
+    fdsan_exchange_owner_tag(fd_, 0, FDTAG);
     if (fp_ != nullptr) {
         fclose(fp_);
         fp_ = nullptr;
         fd_ = -1;
     } else if (fd_ >= 0) {
-        close(fd_);
+        fdsan_close_with_tag(fd_, FDTAG);
         fd_ = -1;
     }
 };

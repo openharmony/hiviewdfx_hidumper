@@ -86,6 +86,7 @@ inline const int64_t ZIP_MAX_SIZE = 100 * 1024 * 1024;
 inline const int64_t ZIP_TARGET_SIZE = 80 * 1024 * 1024;
 
 inline const std::string RELEASE_MODE = "Release";
+const uint64_t FDTAG = 0xD002D20;
 } // namespace HiviewDFX
 } // namespace OHOS
 #endif // HIDUMPER_SERVICES_DUMPER_CONSTANT_H

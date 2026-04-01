@@ -27,7 +27,7 @@ ZipOutput::ZipOutput() : fd_(-1)
 ZipOutput::~ZipOutput()
 {
     if (fd_ >= 0) {
-        close(fd_);
+        fdsan_close_with_tag(fd_, FDTAG);
     }
 }
 
