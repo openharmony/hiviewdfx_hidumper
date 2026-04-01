@@ -15,6 +15,7 @@
 #include "executor/memory_dumper.h"
 #include "dump_utils.h"
 #include <dlfcn.h>
+#include "common/dumper_constant.h"
 
 using namespace std;
 namespace OHOS {
@@ -28,7 +29,7 @@ MemoryDumper::MemoryDumper()
 MemoryDumper::~MemoryDumper()
 {
     if (isZip_ && rawParamFd_ >= 0) {
-        close(rawParamFd_);
+        fdsan_close_with_tag(rawParamFd_, FDTAG);
         rawParamFd_ = -1;
     }
 }
