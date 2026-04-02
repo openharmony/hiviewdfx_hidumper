@@ -50,6 +50,7 @@ private:
     bool HandleDumpMem(std::vector<std::shared_ptr<DumpCfg>> &dumpCfgs);
     bool HandleDumpJsHeapMem(std::vector<std::shared_ptr<DumpCfg>> &dumpCfgs);
     bool HandleDumpCjHeapMem(std::vector<std::shared_ptr<DumpCfg>> &dumpCfgs);
+    bool HandleDumpHeapMem(std::vector<std::shared_ptr<DumpCfg>> &dumpCfgs);
     bool HandleDumpMemShowMaps(std::vector<std::shared_ptr<DumpCfg>> &dumpCfgs);
     void HandleDumpMemCommon(std::shared_ptr<DumperParameter> dumpParam,
         std::vector<std::shared_ptr<DumpCfg>> &dumpCfgs);

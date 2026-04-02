@@ -84,6 +84,7 @@ DumpStatus ConfigUtils::GetDumperConfigs()
     HandleDumpMem(dumpCfgs);
     HandleDumpJsHeapMem(dumpCfgs);
     HandleDumpCjHeapMem(dumpCfgs);
+    HandleDumpHeapMem(dumpCfgs);
     HandleDumpMemShowMaps(dumpCfgs);
     HandleDumpLog(dumpCfgs);
     HandleDumpStorage(dumpCfgs);
@@ -406,6 +407,22 @@ bool ConfigUtils::HandleDumpCjHeapMem(std::vector<std::shared_ptr<DumpCfg>> &dum
     }
     std::shared_ptr<OptionArgs> args;
     GetConfig(CONFIG_DUMPER_CJHEAP_MEMORY, dumpCfgs, args);
+    return true;
+}
+
+bool ConfigUtils::HandleDumpHeapMem(std::vector<std::shared_ptr<DumpCfg>> &dumpCfgs)
+{
+    const DumperOpts &dumperOpts = dumperParam_->GetOpts();
+    if (!dumperOpts.isDumpHeapMem_) {
+        DUMPER_HILOGD(MODULE_COMMON, "Option isDumpHeapMem_ is false.");
+        return false;
+    }
+    DUMPER_HILOGD(MODULE_COMMON, "debug|memPid=%{public}d", dumperOpts.dumpHeapMemPid_);
+    if (dumperOpts.dumpHeapMemPid_ <= 0) {
+        return false;
+    }
+    std::shared_ptr<OptionArgs> args;
+    GetConfig(CONFIG_DUMPER_HEAP_MEMORY, dumpCfgs, args);
     return true;
 }
 
