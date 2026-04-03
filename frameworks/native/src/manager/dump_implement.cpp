@@ -69,6 +69,7 @@ static struct option LONG_OPTIONS[] = {{"cpufreq", no_argument, 0, 0},
     {"leakobj", no_argument, 0, 0},
     {"clean", no_argument, 0, 0},
     {"raw", no_argument, 0, 0},
+    {"single", no_argument, 0, 0},
     {"prune", no_argument, 0, 0},
     {"show-ashmem", no_argument, 0, 0},
     {"show-dmabuf", no_argument, 0, 0},
@@ -544,6 +545,8 @@ DumpStatus DumpImplement::ParseLongCmdOption(int argc, DumperOpts &opts, const s
         return SetGCParam(opts);
     } else if (StringUtils::GetInstance().IsSameStr(longOptions[optionIndex].name, "leakobj")) {
         opts.isDumpJsHeapLeakobj_ = true;
+    } else if (StringUtils::GetInstance().IsSameStr(longOptions[optionIndex].name, "single")) {
+        return SetHeapCombineParam(opts);
     } else if (StringUtils::GetInstance().IsSameStr(longOptions[optionIndex].name, "clean")) {
         return SetCleanParam(opts);
     } else if (StringUtils::GetInstance().IsSameStr(longOptions[optionIndex].name, "ipc")) {
@@ -831,8 +834,8 @@ void DumpImplement::CmdHelp()
         " detail information is stored in /data/log/hidumper/record_mem.txt.\n"
         "  --zip                       |compress output to /data/log/hidumper\n"
         "  --mem-smaps pid [-v]        |display statistic in /proc/pid/smaps, use -v specify more details\n"
-        "  --mem-jsheap pid [-T tid] [--gc] [--leakobj] [--raw] [--clean]  |triggerGC, dumpHeapSnapshot, dumpRawHeap"
-        " and dumpLeakList under pid and tid\n"
+        "  --mem-jsheap pid [-T tid] [--gc] [--leakobj] [--raw] [--single] [--clean]  |triggerGC, dumpHeapSnapshot,"
+        " dumpRawHeap and dumpLeakList under pid and tid\n"
         "  --mem-cjheap pid [--gc]     |the pid should belong to the Cangjie process; triggerGC and"
         " dumpHeapSnapshot under pid\n"
         "  --ipc pid ARG               |ipc load statistic; pid must be specified or set to -a dump all"
@@ -1251,6 +1254,20 @@ bool DumpImplement::CheckUnableToDumpAll(int argc, DumperOpts& opt)
     bool noSelect = !opt.IsSelectAny();
     bool validArgc = (argc == ARG_COUNT_NO_PARAM) || (argc == ARG_COUNT_WITH_ZIP && isZip);
     return noSelect && !validArgc;
+}
+
+DumpStatus DumpImplement::SetHeapCombineParam(DumperOpts &opt)
+{
+    if (!opt.dumpJsRawHeap_) {
+        DUMPER_HILOGE(MODULE_COMMON, "'--single' only used with '--raw'.");
+        return DumpStatus::DUMP_FAIL;
+    }
+    if (opt.threadId_ != 0 && opt.threadId_ != opt.dumpJsHeapMemPid_) {
+        DUMPER_HILOGE(MODULE_COMMON, "mem-jsheap param err, '--single' not need tid.");
+        return DumpStatus::DUMP_FAIL;
+    }
+    opt.isDumpJsHeapCombine_ = true;
+    return DumpStatus::DUMP_OK;
 }
 } // namespace HiviewDFX
 } // namespace OHOS
