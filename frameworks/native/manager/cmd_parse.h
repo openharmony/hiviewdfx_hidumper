@@ -51,6 +51,7 @@ private:
     DumpStatus CheckProcessAlive(DumpContext& dumpContext);
     bool IsSADumperOption(char *argv[]);
     DumpStatus VerifyOptions(const DumpContext& dumpContext);
+    DumpStatus SetHeapCombineParam(DumpContext& dumpContext);
 };
 }
 }

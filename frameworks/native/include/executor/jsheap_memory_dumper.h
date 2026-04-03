@@ -41,6 +41,7 @@ private:
     bool needLeakobj_ = false;
     bool needBinary_ = false;
     bool needClean_ = false;
+    bool needCombine_ = false;
     uint32_t pid_ = 0;
     uint32_t tid_ = 0;
 };

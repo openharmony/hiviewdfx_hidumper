@@ -110,6 +110,7 @@ private:
     DumpStatus SetMemPruneParam(DumperOpts &opt);
     DumpStatus SetGCParam(DumperOpts &opt);
     DumpStatus SetCleanParam(DumperOpts &opt);
+    DumpStatus SetHeapCombineParam(DumperOpts &opt);
     DumpStatus SetEventParam(DumperOpts &opts, const std::string& param);
     void SetZipTitle(const std::shared_ptr<HidumperExecutor>& executor,
         const std::shared_ptr<DumperParameter>& dumpParameter);
