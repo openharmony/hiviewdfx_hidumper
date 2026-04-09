@@ -57,6 +57,10 @@ struct DumperOpts {
     int dumpJsHeapMemPid_;
     int threadId_;
     int ipcStatPid_;
+    bool isDumpHeapMem_;
+    bool isDumpHeapNative_;
+    bool isDumpHeapLeakobj_;
+    int dumpHeapMemPid_;
     bool isDumpAllIpc_;
     bool isDumpIpc_;
     bool isDumpIpcStartStat_;

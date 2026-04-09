@@ -34,6 +34,7 @@
 #include "factory/memory_dumper_factory.h"
 #include "factory/jsheap_memory_dumper_factory.h"
 #include "factory/cjheap_memory_dumper_factory.h"
+#include "factory/heap_memory_dumper_factory.h"
 #include "factory/event_list_dumper_factory.h"
 #include "factory/event_detail_dumper_factory.h"
 #include "factory/traffic_dumper_factory.h"
@@ -65,6 +66,8 @@ static struct option LONG_OPTIONS[] = {{"cpufreq", no_argument, 0, 0},
     {"mem-smaps", required_argument, 0, 0},
     {"mem-jsheap", required_argument, 0, 0},
     {"mem-cjheap", required_argument, 0, 0},
+    {"mem-heap", required_argument, 0, 0},
+    {"native", no_argument, 0, 0},
     {"gc", no_argument, 0, 0},
     {"leakobj", no_argument, 0, 0},
     {"clean", no_argument, 0, 0},
@@ -123,6 +126,8 @@ void DumpImplement::AddExecutorFactoryToMap()
         std::make_pair(DumperConstant::JSHEAP_MEMORY_DUMPER, std::make_shared<JsHeapMemoryDumperFactory>()));
     ptrExecutorFactoryMap_->insert(
         std::make_pair(DumperConstant::CJHEAP_MEMORY_DUMPER, std::make_shared<CjHeapMemoryDumperFactory>()));
+    ptrExecutorFactoryMap_->insert(
+        std::make_pair(DumperConstant::HEAP_MEMORY_DUMPER, std::make_shared<HeapMemoryDumperFactory>()));
     ptrExecutorFactoryMap_->insert(
         std::make_pair(DumperConstant::EVENT_LIST_DUMPER, std::make_shared<EventListDumperFactory>()));
     ptrExecutorFactoryMap_->insert(
@@ -261,6 +266,7 @@ DumpStatus DumpImplement::CmdParse(int argc, char *argv[], std::shared_ptr<Dumpe
     }
     ReportJsheap(opts);
     ReportCjheap(opts);
+    ReportMemheap(opts);
     dumpParameter->SetOpts(opts);
     return DumpStatus::DUMP_OK;
 }
@@ -318,6 +324,10 @@ DumpStatus DumpImplement::CmdParseWithParameter(int argc, char *argv[], DumperOp
         return DumpStatus::DUMP_HELP;
     }
     if (CheckUnableToDumpAll(argc, opts)) {
+        CmdHelp();
+        return DumpStatus::DUMP_HELP;
+    }
+    if (opts.isDumpHeapMem_ && !CheckDumpHeapMemParameter(argc, opts)) {
         CmdHelp();
         return DumpStatus::DUMP_HELP;
     }
@@ -537,6 +547,10 @@ DumpStatus DumpImplement::ParseLongCmdOption(int argc, DumperOpts &opts, const s
         return SetMemJsheapParam(opts);
     } else if (StringUtils::GetInstance().IsSameStr(longOptions[optionIndex].name, "mem-cjheap")) {
         return SetMemCjheapParam(opts);
+    } else if (StringUtils::GetInstance().IsSameStr(longOptions[optionIndex].name, "mem-heap")) {
+        return SetMemHeapParam(opts);
+    } else if (StringUtils::GetInstance().IsSameStr(longOptions[optionIndex].name, "native")) {
+        return SetNativeParam(opts);
     } else if (StringUtils::GetInstance().IsSameStr(longOptions[optionIndex].name, "raw")) {
         return SetRawParam(opts);
     } else if (StringUtils::GetInstance().IsSameStr(longOptions[optionIndex].name, "prune")) {
@@ -544,7 +558,7 @@ DumpStatus DumpImplement::ParseLongCmdOption(int argc, DumperOpts &opts, const s
     } else if (StringUtils::GetInstance().IsSameStr(longOptions[optionIndex].name, "gc")) {
         return SetGCParam(opts);
     } else if (StringUtils::GetInstance().IsSameStr(longOptions[optionIndex].name, "leakobj")) {
-        opts.isDumpJsHeapLeakobj_ = true;
+        return SetLeakobjParam(opts);
     } else if (StringUtils::GetInstance().IsSameStr(longOptions[optionIndex].name, "single")) {
         return SetHeapCombineParam(opts);
     } else if (StringUtils::GetInstance().IsSameStr(longOptions[optionIndex].name, "clean")) {
@@ -608,6 +622,28 @@ DumpStatus DumpImplement::SetMemCjheapParam(DumperOpts &opt)
     return SetCmdIntegerParameter(optarg, opt.dumpCjHeapMemPid_);
 }
 
+DumpStatus DumpImplement::SetMemHeapParam(DumperOpts &opt)
+{
+    opt.isDumpHeapMem_ = true;
+    dumperSysEventParams_->opt = "mem-heap";
+    if (optarg == nullptr) {
+        DUMPER_HILOGE(MODULE_COMMON, "mem-heap nullptr");
+        return DumpStatus::DUMP_FAIL;
+    }
+    return SetCmdIntegerParameter(optarg, opt.dumpHeapMemPid_);
+}
+
+DumpStatus DumpImplement::SetNativeParam(DumperOpts &opt)
+{
+    DumpStatus status = DumpStatus::DUMP_FAIL;
+    if (opt.isDumpHeapMem_) {
+        DUMPER_HILOGI(MODULE_COMMON, "SetNativeParam success");
+        opt.isDumpHeapNative_ = true;
+        status = DumpStatus::DUMP_OK;
+    }
+    return status;
+}
+
 DumpStatus DumpImplement::SetRawParam(DumperOpts &opt)
 {
     DumpStatus status = DumpStatus::DUMP_FAIL;
@@ -639,6 +675,20 @@ DumpStatus DumpImplement::SetGCParam(DumperOpts &opt)
         status = DumpStatus::DUMP_OK;
     } else if (opt.isDumpCjHeapMem_) {
         opt.isDumpCjHeapMemGC_ = true;
+        status = DumpStatus::DUMP_OK;
+    }
+    return status;
+}
+
+DumpStatus DumpImplement::SetLeakobjParam(DumperOpts &opt)
+{
+    DumpStatus status = DumpStatus::DUMP_FAIL;
+    if (opt.isDumpJsHeapMem_) {
+        opt.isDumpJsHeapLeakobj_ = true;
+        status = DumpStatus::DUMP_OK;
+    } else if (opt.isDumpHeapMem_ && opt.isDumpHeapNative_) {
+        DUMPER_HILOGI(MODULE_COMMON, "SetLeakobjParam success");
+        opt.isDumpHeapLeakobj_ = true;
         status = DumpStatus::DUMP_OK;
     }
     return status;
@@ -838,6 +888,7 @@ void DumpImplement::CmdHelp()
         " dumpRawHeap and dumpLeakList under pid and tid\n"
         "  --mem-cjheap pid [--gc]     |the pid should belong to the Cangjie process; triggerGC and"
         " dumpHeapSnapshot under pid\n"
+        "  --mem-heap pid ARG [--leakobj]  |ARG must be one of --native.\n"
         "  --ipc pid ARG               |ipc load statistic; pid must be specified or set to -a dump all"
         " processes. ARG must be one of --start-stat | --stop-stat | --stat\n";
 
@@ -1164,6 +1215,10 @@ DumpStatus DumpImplement::CheckProcessAlive(const DumperOpts &opts)
         SendPidErrorMessage(opts.dumpCjHeapMemPid_);
         return DumpStatus::DUMP_FAIL;
     }
+    if ((opts.dumpHeapMemPid_ > 0) && !DumpUtils::CheckProcessAlive(opts.dumpHeapMemPid_)) {
+        SendPidErrorMessage(opts.dumpHeapMemPid_);
+        return DumpStatus::DUMP_FAIL;
+    }
     if ((opts.ipcStatPid_ > 0) && !DumpUtils::CheckProcessAlive(opts.ipcStatPid_)) {
         SendPidErrorMessage(opts.ipcStatPid_);
         return DumpStatus::DUMP_FAIL;
@@ -1211,6 +1266,21 @@ void DumpImplement::ReportCjheap(const DumperOpts &opts)
         DUMPER_HILOGE(MODULE_COMMON, "hisysevent report mem cjheap failed! ret %{public}d.", memCjheapRet);
     }
 }
+
+void DumpImplement::ReportMemheap(const DumperOpts &opts)
+{
+    if (!opts.isDumpHeapMem_) {
+        return;
+    }
+    std::string strType = "hidumperNativeHeap";
+    int memHeapRet = HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::FRAMEWORK, "ARK_STATS_DUMP",
+        OHOS::HiviewDFX::HiSysEvent::EventType::FAULT,
+        "PID", std::to_string(opts.dumpHeapMemPid_),
+        "TYPE", strType);
+    if (memHeapRet != 0) {
+        DUMPER_HILOGE(MODULE_COMMON, "hisysevent report mem heap failed! ret %{public}d.", memHeapRet);
+    }
+}
 #endif
 
 bool DumpImplement::CheckDumpPermission(DumperOpts& opt)
@@ -1239,6 +1309,12 @@ bool DumpImplement::CheckDumpPermission(DumperOpts& opt)
         DUMPER_HILOGE(MODULE_COMMON, "DumpCjHeapMem false isUserMode %{public}d", isUserMode);
         return false;
     }
+    // mem-heap + releaseApp
+    if (opt.isDumpHeapMem_ && !DumpUtils::CheckAppDebugVersion(opt.dumpHeapMemPid_)) {
+        SendReleaseAppErrorMessage("--mem-heap");
+        DUMPER_HILOGE(MODULE_COMMON, "DumpHeapMem false isUserMode %{public}d", isUserMode);
+        return false;
+    }
     if (opt.isDumpMem_ && opt.timeInterval_ > 0) {
         SendReleaseVersionErrorMessage("-t");
         DUMPER_HILOGE(MODULE_COMMON, "Show mem false, isUserMode:%{public}d, pid:%{public}d, timeInterval_:%{public}d",
@@ -1254,6 +1330,14 @@ bool DumpImplement::CheckUnableToDumpAll(int argc, DumperOpts& opt)
     bool noSelect = !opt.IsSelectAny();
     bool validArgc = (argc == ARG_COUNT_NO_PARAM) || (argc == ARG_COUNT_WITH_ZIP && isZip);
     return noSelect && !validArgc;
+}
+
+bool DumpImplement::CheckDumpHeapMemParameter(int argc, DumperOpts& opt)
+{
+    bool isMust = opt.isDumpHeapNative_;
+    bool validArgc = argc >= ARG_COUNT_HEAP_MEM;
+    DUMPER_HILOGI(MODULE_COMMON, "CheckDumpHeapMemParameter %{public}d", isMust && validArgc);
+    return isMust && validArgc;
 }
 
 DumpStatus DumpImplement::SetHeapCombineParam(DumperOpts &opt)
