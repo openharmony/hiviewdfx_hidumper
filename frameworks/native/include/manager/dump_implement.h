@@ -96,19 +96,24 @@ private:
 #ifdef HIDUMPER_HIVIEWDFX_HISYSEVENT_ENABLE
     void ReportJsheap(const DumperOpts &opts);
     void ReportCjheap(const DumperOpts &opts);
+    void ReportMemheap(const DumperOpts &opts);
 #endif
     bool CheckAppDebugVersion(int pid);
     bool CheckDumpPermission(DumperOpts &opt);
     bool CheckUnableToDumpAll(int argc, DumperOpts& opt);
+    bool CheckDumpHeapMemParameter(int argc, DumperOpts& opt);
     bool SetIpcStatParam(DumperOpts &opt, const std::string& param);
     DumpStatus ParseCmdOptionForA(DumperOpts &opt, char *argv[]);
     void ProcessDumpOptions(int clientPid, std::shared_ptr<DumperParameter> &dumpParameter, DumperOpts &opts);
     DumpStatus SetMemSmapsParam(DumperOpts &opt, int argc, char *argv[]);
     DumpStatus SetMemJsheapParam(DumperOpts &opt);
     DumpStatus SetMemCjheapParam(DumperOpts &opt);
+    DumpStatus SetMemHeapParam(DumperOpts &opt);
+    DumpStatus SetNativeParam(DumperOpts &opt);
     DumpStatus SetRawParam(DumperOpts &opt);
     DumpStatus SetMemPruneParam(DumperOpts &opt);
     DumpStatus SetGCParam(DumperOpts &opt);
+    DumpStatus SetLeakobjParam(DumperOpts &opt);
     DumpStatus SetCleanParam(DumperOpts &opt);
     DumpStatus SetHeapCombineParam(DumperOpts &opt);
     DumpStatus SetEventParam(DumperOpts &opts, const std::string& param);
@@ -134,6 +139,7 @@ private:
     static const int HIVIEW_UID = 1201;
     static const int ARG_COUNT_NO_PARAM = 1;
     static const int ARG_COUNT_WITH_ZIP = 2;
+    static const int ARG_COUNT_HEAP_MEM = 4;
     static thread_local std::unique_ptr<DumperSysEventParams> dumperSysEventParams_;
 };
 } // namespace HiviewDFX

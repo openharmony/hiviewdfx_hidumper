@@ -134,6 +134,10 @@ void DumperOpts::ResetJsHeapOptions()
     dumpJsHeapMemPid_ = 0;
     dumpCjHeapMemPid_ = 0;
     dumpJsRawHeap_ = false;
+    isDumpHeapMem_ = false;
+    isDumpHeapNative_ = false;
+    isDumpHeapLeakobj_ = false;
+    dumpHeapMemPid_ = 0;
 }
 
 void DumperOpts::ResetMiscOptions()
@@ -244,6 +248,10 @@ void DumperOpts::AssignJsHeapOptions(const DumperOpts& opts)
     dumpJsHeapMemPid_ = opts.dumpJsHeapMemPid_;
     dumpCjHeapMemPid_ = opts.dumpCjHeapMemPid_;
     dumpJsRawHeap_ = opts.dumpJsRawHeap_;
+    isDumpHeapMem_ = opts.isDumpHeapMem_;
+    isDumpHeapNative_ = opts.isDumpHeapNative_;
+    isDumpHeapLeakobj_ = opts.isDumpHeapLeakobj_;
+    dumpHeapMemPid_ = opts.dumpHeapMemPid_;
 }
 
 void DumperOpts::AssignIpcOptions(const DumperOpts& opts)
@@ -321,6 +329,9 @@ bool DumperOpts::IsSelectAny() const
         return true;
     }
     if (isDumpCjHeapMem_) {
+        return true;
+    }
+    if (isDumpHeapMem_) {
         return true;
     }
     if (isDumpIpc_) {
