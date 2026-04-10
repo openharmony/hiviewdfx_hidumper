@@ -418,7 +418,7 @@ bool ConfigUtils::HandleDumpHeapMem(std::vector<std::shared_ptr<DumpCfg>> &dumpC
         return false;
     }
     DUMPER_HILOGD(MODULE_COMMON, "debug|memPid=%{public}d", dumperOpts.dumpHeapMemPid_);
-    if (dumperOpts.dumpHeapMemPid_ <= 0) {
+    if (dumperOpts.dumpHeapMemPid_ <= 0 && dumperOpts.dumpHeapArgPid_ <= 0) {
         return false;
     }
     std::shared_ptr<OptionArgs> args;
