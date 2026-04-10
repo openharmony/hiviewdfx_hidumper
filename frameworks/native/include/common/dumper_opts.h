@@ -59,8 +59,10 @@ struct DumperOpts {
     int ipcStatPid_;
     bool isDumpHeapMem_;
     bool isDumpHeapNative_;
+    bool isDumpHeapKotlin_;
     bool isDumpHeapLeakobj_;
     int dumpHeapMemPid_;
+    int dumpHeapArgPid_;
     bool isDumpAllIpc_;
     bool isDumpIpc_;
     bool isDumpIpcStartStat_;

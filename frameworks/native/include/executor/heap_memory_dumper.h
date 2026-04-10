@@ -33,7 +33,7 @@ public:
     DumpStatus AfterExecute() override;
 private:
     AppExecFwk::MemDumpType DetermineDumpType(const std::shared_ptr<DumperParameter> &parameter) const;
-    
+
     DumpStatus status_ = DUMP_FAIL;
     StringMatrix dumpDatas_;
     std::unique_ptr<DumpHeapInfo> heapInfo_;

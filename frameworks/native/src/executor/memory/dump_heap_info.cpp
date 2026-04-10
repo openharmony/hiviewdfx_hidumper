@@ -48,7 +48,6 @@ bool DumpHeapInfo::DumpHeapMemory(OHOS::AppExecFwk::MemDumpInfo &info, std::stri
         DUMPER_HILOGE(MODULE_SERVICE, "DumpHeapMemory return failed, ret is:%{public}d", ret);
         return false;
     }
-    DUMPER_HILOGI(MODULE_SERVICE, "DumpHeapMemory: dumpResult:%{public}s", dumpResult.c_str());
 #endif
     return true;
 }

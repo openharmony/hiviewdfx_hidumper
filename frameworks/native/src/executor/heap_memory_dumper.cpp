@@ -30,8 +30,11 @@ HeapMemoryDumper::~HeapMemoryDumper()
 AppExecFwk::MemDumpType HeapMemoryDumper::DetermineDumpType(
     const std::shared_ptr<DumperParameter> &parameter) const
 {
+    bool isKotlin = parameter->GetOpts().isDumpHeapKotlin_;
     bool isNative = parameter->GetOpts().isDumpHeapNative_;
-    if (isNative) {
+    if (isKotlin) {
+        return AppExecFwk::MemDumpType::KMP_KOTLIN;
+    } else if (isNative) {
         return AppExecFwk::MemDumpType::NATIVE;
     }
     return AppExecFwk::MemDumpType::INVALID;
@@ -44,7 +47,11 @@ DumpStatus HeapMemoryDumper::PreExecute(const shared_ptr<DumperParameter> &param
         return DumpStatus::DUMP_FAIL;
     }
     needLeakobj_ = parameter->GetOpts().isDumpHeapLeakobj_;
-    pid_ = parameter->GetOpts().dumpHeapMemPid_;
+    if (parameter->GetOpts().dumpHeapArgPid_ > 0) {
+        pid_ = parameter->GetOpts().dumpHeapArgPid_;
+    } else {
+        pid_ = parameter->GetOpts().dumpHeapMemPid_;
+    }
     dumpDatas_ = dumpDatas;
     dumpType_ = DetermineDumpType(parameter);
     return DumpStatus::DUMP_OK;
@@ -56,8 +63,9 @@ DumpStatus HeapMemoryDumper::Execute()
     info.pid = pid_;
     info.dumpType = dumpType_;
     info.needLeakobj = needLeakobj_;
+    info.mayReportToOEM = false;
 
-    if (info.needLeakobj) {
+    if (info.dumpType == AppExecFwk::MemDumpType::NATIVE && info.needLeakobj) {
         info.isSync = true;
     } else {
         info.isSync = false;

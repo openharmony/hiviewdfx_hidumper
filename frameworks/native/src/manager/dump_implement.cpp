@@ -66,8 +66,9 @@ static struct option LONG_OPTIONS[] = {{"cpufreq", no_argument, 0, 0},
     {"mem-smaps", required_argument, 0, 0},
     {"mem-jsheap", required_argument, 0, 0},
     {"mem-cjheap", required_argument, 0, 0},
-    {"mem-heap", required_argument, 0, 0},
-    {"native", no_argument, 0, 0},
+    {"mem-heap", optional_argument, 0, 0},
+    {"native", optional_argument, 0, 0},
+    {"kmp-kotlin", optional_argument, 0, 0},
     {"gc", no_argument, 0, 0},
     {"leakobj", no_argument, 0, 0},
     {"clean", no_argument, 0, 0},
@@ -418,6 +419,12 @@ DumpStatus DumpImplement::HandleOptionParameter(const std::string &optionName,
         dumperSysEventParams_->target += optionValue;
     } else if (optionName == "--ipc") {
         status = SetCmdIntegerParameter(optionValue, opts.ipcStatPid_);
+    } else if (optionName == "--mem-heap") {
+        status = SetCmdIntegerParameter(optionValue, opts.dumpHeapMemPid_);
+    } else if (optionName == "--native") {
+        status = SetCmdIntegerParameter(optionValue, opts.dumpHeapArgPid_);
+    } else if (optionName == "--kmp-kotlin") {
+        status = SetCmdIntegerParameter(optionValue, opts.dumpHeapArgPid_);
     } else {
         SendErrorMessageIf(opts, optionValue);
         return DumpStatus::DUMP_FAIL;
@@ -551,6 +558,8 @@ DumpStatus DumpImplement::ParseLongCmdOption(int argc, DumperOpts &opts, const s
         return SetMemHeapParam(opts);
     } else if (StringUtils::GetInstance().IsSameStr(longOptions[optionIndex].name, "native")) {
         return SetNativeParam(opts);
+    } else if (StringUtils::GetInstance().IsSameStr(longOptions[optionIndex].name, "kmp-kotlin")) {
+        return SetKotlinParam(opts);
     } else if (StringUtils::GetInstance().IsSameStr(longOptions[optionIndex].name, "raw")) {
         return SetRawParam(opts);
     } else if (StringUtils::GetInstance().IsSameStr(longOptions[optionIndex].name, "prune")) {
@@ -626,11 +635,7 @@ DumpStatus DumpImplement::SetMemHeapParam(DumperOpts &opt)
 {
     opt.isDumpHeapMem_ = true;
     dumperSysEventParams_->opt = "mem-heap";
-    if (optarg == nullptr) {
-        DUMPER_HILOGE(MODULE_COMMON, "mem-heap nullptr");
-        return DumpStatus::DUMP_FAIL;
-    }
-    return SetCmdIntegerParameter(optarg, opt.dumpHeapMemPid_);
+    return DumpStatus::DUMP_OK;
 }
 
 DumpStatus DumpImplement::SetNativeParam(DumperOpts &opt)
@@ -640,6 +645,22 @@ DumpStatus DumpImplement::SetNativeParam(DumperOpts &opt)
         DUMPER_HILOGI(MODULE_COMMON, "SetNativeParam success");
         opt.isDumpHeapNative_ = true;
         status = DumpStatus::DUMP_OK;
+    }
+    return status;
+}
+
+DumpStatus DumpImplement::SetKotlinParam(DumperOpts &opt)
+{
+    DumpStatus status = DumpStatus::DUMP_FAIL;
+    if (opt.isDumpHeapMem_) {
+        DUMPER_HILOGI(MODULE_COMMON, "SetKotlinParam success");
+        opt.isDumpHeapKotlin_ = true;
+        status = DumpStatus::DUMP_OK;
+    } else {
+        DUMPER_HILOGE(MODULE_COMMON, "kmp-kotlin param invalid");
+        SendErrorMessage("kmp-kotlin param invalid\n");
+        CmdHelp();
+        status =  DumpStatus::DUMP_HELP;
     }
     return status;
 }
@@ -888,7 +909,7 @@ void DumpImplement::CmdHelp()
         " dumpRawHeap and dumpLeakList under pid and tid\n"
         "  --mem-cjheap pid [--gc]     |the pid should belong to the Cangjie process; triggerGC and"
         " dumpHeapSnapshot under pid\n"
-        "  --mem-heap pid ARG [--leakobj]  |ARG must be one of --native.\n"
+        "  --mem-heap pid ARG [--leakobj]  |ARG must be one of --native or --kmp-kotlin.\n"
         "  --ipc pid ARG               |ipc load statistic; pid must be specified or set to -a dump all"
         " processes. ARG must be one of --start-stat | --stop-stat | --stat\n";
 
@@ -1219,6 +1240,10 @@ DumpStatus DumpImplement::CheckProcessAlive(const DumperOpts &opts)
         SendPidErrorMessage(opts.dumpHeapMemPid_);
         return DumpStatus::DUMP_FAIL;
     }
+    if ((opts.dumpHeapArgPid_ > 0) && !DumpUtils::CheckProcessAlive(opts.dumpHeapArgPid_)) {
+        SendPidErrorMessage(opts.dumpHeapArgPid_);
+        return DumpStatus::DUMP_FAIL;
+    }
     if ((opts.ipcStatPid_ > 0) && !DumpUtils::CheckProcessAlive(opts.ipcStatPid_)) {
         SendPidErrorMessage(opts.ipcStatPid_);
         return DumpStatus::DUMP_FAIL;
@@ -1272,10 +1297,18 @@ void DumpImplement::ReportMemheap(const DumperOpts &opts)
     if (!opts.isDumpHeapMem_) {
         return;
     }
-    std::string strType = "hidumperNativeHeap";
+    std::string strType;
+    if (opts.isDumpHeapKotlin_) {
+        strType = "hidumperKmpHeap";
+    } else if (opts.isDumpHeapNative_) {
+        strType = "hidumperNativeHeap";
+    } else {
+        return;
+    }
+    int pid = opts.dumpHeapArgPid_ > 0 ? opts.dumpHeapArgPid_ : opts.dumpHeapMemPid_;
     int memHeapRet = HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::FRAMEWORK, "ARK_STATS_DUMP",
         OHOS::HiviewDFX::HiSysEvent::EventType::FAULT,
-        "PID", std::to_string(opts.dumpHeapMemPid_),
+        "PID", std::to_string(pid),
         "TYPE", strType);
     if (memHeapRet != 0) {
         DUMPER_HILOGE(MODULE_COMMON, "hisysevent report mem heap failed! ret %{public}d.", memHeapRet);
@@ -1334,10 +1367,12 @@ bool DumpImplement::CheckUnableToDumpAll(int argc, DumperOpts& opt)
 
 bool DumpImplement::CheckDumpHeapMemParameter(int argc, DumperOpts& opt)
 {
-    bool isMust = opt.isDumpHeapNative_;
     bool validArgc = argc >= ARG_COUNT_HEAP_MEM;
-    DUMPER_HILOGI(MODULE_COMMON, "CheckDumpHeapMemParameter %{public}d", isMust && validArgc);
-    return isMust && validArgc;
+    bool validPid = (opt.dumpHeapMemPid_ > 0 && opt.dumpHeapArgPid_ == 0) ||
+        (opt.dumpHeapMemPid_ == 0 && opt.dumpHeapArgPid_ > 0);
+    bool validArg = (opt.isDumpHeapNative_ + opt.isDumpHeapKotlin_ == 1);
+    DUMPER_HILOGI(MODULE_COMMON, "CheckDumpHeapMemParameter %{public}d", validArgc && validPid && validArg);
+    return validArgc && validPid && validArg;
 }
 
 DumpStatus DumpImplement::SetHeapCombineParam(DumperOpts &opt)
