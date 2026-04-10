@@ -448,50 +448,19 @@ bool DumpUtils::IsUserMode()
 
 bool DumpUtils::CheckAppDebugVersion(int pid)
 {
-    if (pid <= 0) {
-        DUMPER_HILOGE(MODULE_COMMON, "AppDebugVersion pid %{public}d false", pid);
-        return false;
-    }
-    std::string bundleName;
-    std::string filePath = "/proc/" + std::to_string(pid) + "/cmdline";
-    if (!OHOS::LoadStringFromFile(filePath, bundleName)) {
-        DUMPER_HILOGE(MODULE_COMMON, "Get process name by pid %{public}d failed!", pid);
-        return false;
-    }
-    if (bundleName.empty()) {
-        DUMPER_HILOGE(MODULE_COMMON, "Pid %{public}d or process name is illegal!", pid);
-        return false;
-    }
-    auto pos = bundleName.find(":");
-    if (pos != std::string::npos) {
-        bundleName = bundleName.substr(0, pos);
-    }
-    std::string appName = bundleName.substr(0, strlen(bundleName.c_str()));
-    sptr<ISystemAbilityManager> sam = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (sam == nullptr) {
-        DUMPER_HILOGE(MODULE_COMMON, "Pid %{public}d GetSystemAbilityManager", pid);
-        return false;
-    }
-    sptr<IRemoteObject> remoteObject = sam->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
-    if (remoteObject == nullptr) {
-        DUMPER_HILOGE(MODULE_COMMON, "Pid %{public}d Get BundleMgr SA failed!", pid);
-        return false;
-    }
 #ifdef HIDUMPER_BUNDLEMANAGER_FRAMEWORK_ENABLE
-    sptr<AppExecFwk::IBundleMgr> proxy = iface_cast<AppExecFwk::IBundleMgr>(remoteObject);
     AppExecFwk::ApplicationInfo appInfo;
-    bool ret = proxy->GetApplicationInfo(appName, AppExecFwk::GET_APPLICATION_INFO_WITH_DISABLE,
-                                         AppExecFwk::Constants::ANY_USERID, appInfo);
-    if (!ret) {
-        DUMPER_HILOGE(MODULE_COMMON, "Pid %{public}d %{public}s Get App info failed!", pid, appName.c_str());
+    if (!GetApplicationInfoBase(pid, appInfo)) {
         return false;
     }
     bool isDebugApp = (appInfo.appProvisionType == AppExecFwk::Constants::APP_PROVISION_TYPE_DEBUG);
-    DUMPER_HILOGD(MODULE_COMMON, "debug|pid %{public}d %{public}s DebugVersion %{public}d",
-        pid, appName.c_str(), isDebugApp);
+    DUMPER_HILOGD(MODULE_COMMON, "check debugversion, pid %{public}d isDebugApp=%{public}d",
+        pid, isDebugApp);
     return isDebugApp;
 #else
-    DUMPER_HILOGD(MODULE_COMMON, "debug|pid %{public}d %{public}s DebugVersion false", pid, appName.c_str());
+    DUMPER_HILOGD(MODULE_COMMON,
+        "check debugversion failed, HIDUMPER_BUNDLEMANAGER_FRAMEWORK_ENABLE not defined, pid %{public}d",
+        pid);
     return false;
 #endif
 }
@@ -505,6 +474,108 @@ bool DumpUtils::IsHmKernel()
         isHM = osRelease.find("HongMeng") != std::string::npos;
     }
     return isHM;
+}
+
+bool DumpUtils::GetBundleNameByPid(int pid, std::string &bundleName)
+{
+    if (pid <= 0) {
+        DUMPER_HILOGE(MODULE_COMMON, "pid <= 0, pid %{public}d", pid);
+        return false;
+    }
+    std::string filePath = "/proc/" + std::to_string(pid) + "/cmdline";
+    if (!OHOS::LoadStringFromFile(filePath, bundleName)) {
+        DUMPER_HILOGE(MODULE_COMMON, "LoadStringFromFile failed, pid %{public}d", pid);
+        return false;
+    }
+    if (bundleName.empty()) {
+        DUMPER_HILOGE(MODULE_COMMON, "bundleName is empty, pid %{public}d", pid);
+        return false;
+    }
+    auto pos = bundleName.find(":");
+    if (pos != std::string::npos) {
+        bundleName = bundleName.substr(0, pos);
+    }
+    bundleName = bundleName.substr(0, strlen(bundleName.c_str()));
+    return true;
+}
+
+bool DumpUtils::IsDeveloperModeEnabled()
+{
+    std::string developerMode = OHOS::system::GetParameter("const.security.developermode.state", "");
+    DUMPER_HILOGD(MODULE_COMMON, "check developermode|developerMode=%{public}s",
+        developerMode.c_str());
+    return developerMode == "true";
+}
+
+#ifdef HIDUMPER_BUNDLEMANAGER_FRAMEWORK_ENABLE
+bool DumpUtils::GetApplicationInfoBase(int pid, AppExecFwk::ApplicationInfo &appInfo)
+{
+    std::string bundleName;
+    if (!GetBundleNameByPid(pid, bundleName)) {
+        DUMPER_HILOGE(MODULE_COMMON, "GetBundleNameByPid failed, pid %{public}d", pid);
+        return false;
+    }
+    sptr<ISystemAbilityManager> sam = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (sam == nullptr) {
+        DUMPER_HILOGE(MODULE_COMMON, "GetSystemAbilityManager failed, pid %{public}d", pid);
+        return false;
+    }
+    sptr<IRemoteObject> remoteObject = sam->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
+    if (remoteObject == nullptr) {
+        DUMPER_HILOGE(MODULE_COMMON, "GetSystemAbility failed, pid %{public}d ", pid);
+        return false;
+    }
+    sptr<AppExecFwk::IBundleMgr> proxy = iface_cast<AppExecFwk::IBundleMgr>(remoteObject);
+    if (proxy == nullptr) {
+        DUMPER_HILOGE(MODULE_COMMON, "iface_cast failed, pid %{public}d", pid);
+        return false;
+    }
+    ErrCode ret = proxy->GetApplicationInfoV9(bundleName, AppExecFwk::GET_APPLICATION_INFO_WITH_DISABLE,
+        AppExecFwk::Constants::ANY_USERID, appInfo);
+    if (ret != ERR_OK) {
+        DUMPER_HILOGE(MODULE_COMMON, "GetApplicationInfoV9 failed, pid %{public}d, ret=%{public}d", pid, ret);
+        return false;
+    }
+    return true;
+}
+#endif
+
+bool DumpUtils::CheckAppProfileable(int pid)
+{
+#ifdef HIDUMPER_BUNDLEMANAGER_FRAMEWORK_ENABLE
+    AppExecFwk::ApplicationInfo appInfo;
+    if (!GetApplicationInfoBase(pid, appInfo)) {
+        return false;
+    }
+    bool isProfileable = appInfo.profileable;
+    DUMPER_HILOGD(MODULE_COMMON, "check profileable, pid %{public}d isProfileable=%{public}d",
+        pid, isProfileable);
+    return isProfileable;
+#else
+    DUMPER_HILOGD(MODULE_COMMON,
+        "check profileable failed, HIDUMPER_BUNDLEMANAGER_FRAMEWORK_ENABLE not defined, pid %{public}d",
+        pid);
+    return false;
+#endif
+}
+
+bool DumpUtils::CheckAppInhouse(int pid)
+{
+#ifdef HIDUMPER_BUNDLEMANAGER_FRAMEWORK_ENABLE
+    AppExecFwk::ApplicationInfo appInfo;
+    if (!GetApplicationInfoBase(pid, appInfo)) {
+        return false;
+    }
+    bool isInhouse = (appInfo.appDistributionType == "enterprise");
+    DUMPER_HILOGD(MODULE_COMMON, "check inhouse, pid %{public}d isInhouse=%{public}d",
+        pid, isInhouse);
+    return isInhouse;
+#else
+    DUMPER_HILOGD(MODULE_COMMON,
+        "check inhouse failed, HIDUMPER_BUNDLEMANAGER_FRAMEWORK_ENABLE not defined, pid %{public}d",
+        pid);
+    return false;
+#endif
 }
 } // namespace HiviewDFX
 } // namespace OHOS

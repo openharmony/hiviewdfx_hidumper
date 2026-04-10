@@ -82,6 +82,8 @@ private:
     void SendPidErrorMessage(int pid);
     void SendReleaseAppErrorMessage(const std::string& opt);
     void SendReleaseVersionErrorMessage(const std::string& opt);
+    void SendPermissionCheckErrorMessage(const std::string& opt, bool isProfileable,
+        bool isInhouse, bool isDeveloperMode);
     bool ParseSubLongCmdOption(int argc, DumperOpts &opts, const struct option longOptions[],
         const int &optionIndex, char *argv[]);
     bool ParseEventCmdOption(DumperOpts &opts, const std::string& param);
@@ -99,6 +101,7 @@ private:
     void ReportMemheap(const DumperOpts &opts);
 #endif
     bool CheckAppDebugVersion(int pid);
+    bool CheckJsHeapPermission(int pid);
     bool CheckDumpPermission(DumperOpts &opt);
     bool CheckUnableToDumpAll(int argc, DumperOpts& opt);
     bool CheckDumpHeapMemParameter(int argc, DumperOpts& opt);
