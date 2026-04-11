@@ -1181,7 +1181,7 @@ void DumpImplement::RemoveDuplicateString(DumperOpts &opts)
 #ifdef HIDUMPER_HIVIEWDFX_HISYSEVENT_ENABLE
 void DumpImplement::ReportJsheap(const DumperOpts &opts)
 {
-    if (!opts.isDumpJsHeapMem_) {
+    if (!opts.isDumpJsHeapMem_ || opts.isDumpJsHeapMemGC_) {
         return;
     }
     std::string strType = "hidumper";
@@ -1199,7 +1199,7 @@ void DumpImplement::ReportJsheap(const DumperOpts &opts)
 
 void DumpImplement::ReportCjheap(const DumperOpts &opts)
 {
-    if (!opts.isDumpCjHeapMem_) {
+    if (!opts.isDumpCjHeapMem_ || opts.isDumpCjHeapMemGC_) {
         return;
     }
     std::string strType = "hidumper";
