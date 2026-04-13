@@ -152,6 +152,9 @@ void DumperOpts::ResetMiscOptions()
     isShowSmaps_ = false;
     isShowSmapsInfo_ = false;
     threadId_ = 0;
+    isDumpFd_ = false;
+    isDumpThread_ = false;
+    isDumpFdThreadAll_ = false;
 }
 
 DumperOpts& DumperOpts::operator=(const DumperOpts& opts)
@@ -276,6 +279,9 @@ void DumperOpts::AssignMiscOptions(const DumperOpts& opts)
     path_ = opts.path_;
     isAppendix_ = opts.isAppendix_;
     threadId_ = opts.threadId_;
+    isDumpFd_ = opts.isDumpFd_;
+    isDumpThread_ = opts.isDumpThread_;
+    isDumpFdThreadAll_ = opts.isDumpFdThreadAll_;
 }
 
 void DumperOpts::AddSelectAll()

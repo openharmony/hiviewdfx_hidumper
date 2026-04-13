@@ -78,6 +78,9 @@ struct DumperOpts {
     bool showGpumem_;
     bool isEventList_;
     bool isEventDetail_;
+    bool isDumpFd_;
+    bool isDumpThread_;
+    bool isDumpFdThreadAll_;
 
 public:
     DumperOpts();

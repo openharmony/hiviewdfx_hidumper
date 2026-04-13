@@ -37,6 +37,7 @@
 #include "factory/heap_memory_dumper_factory.h"
 #include "factory/event_list_dumper_factory.h"
 #include "factory/event_detail_dumper_factory.h"
+#include "factory/fd_thread_dumper_factory.h"
 #include "factory/traffic_dumper_factory.h"
 #include "factory/ipc_stat_dumper_factory.h"
 #include "dump_utils.h"
@@ -85,6 +86,9 @@ static struct option LONG_OPTIONS[] = {{"cpufreq", no_argument, 0, 0},
     {"print", no_argument, 0, 0},
     {"since", required_argument, 0, 0},
     {"until", required_argument, 0, 0},
+    {"fd", no_argument, 0, 0},
+    {"thread", no_argument, 0, 0},
+    {"all", no_argument, 0, 0},
     {0, 0, 0, 0}};
 
 thread_local std::unique_ptr<DumperSysEventParams> DumpImplement::dumperSysEventParams_{nullptr};
@@ -132,6 +136,8 @@ void DumpImplement::AddExecutorFactoryToMap()
         std::make_pair(DumperConstant::EVENT_LIST_DUMPER, std::make_shared<EventListDumperFactory>()));
     ptrExecutorFactoryMap_->insert(
         std::make_pair(DumperConstant::EVENT_DETAIL_DUMPER, std::make_shared<EventDetailDumperFactory>()));
+    ptrExecutorFactoryMap_->insert(
+        std::make_pair(DumperConstant::FD_THREAD_DUMPER, std::make_shared<FdThreadDumperFactory>()));
     ptrExecutorFactoryMap_->insert(
         std::make_pair(DumperConstant::TRAFFIC_DUMPER, std::make_shared<TrafficDumperFactory>()));
     ptrExecutorFactoryMap_->insert(
@@ -543,6 +549,12 @@ DumpStatus DumpImplement::ParseLongCmdOption(int argc, DumperOpts &opts, const s
         opts.showDmaBuf_ = true;
     } else if (StringUtils::GetInstance().IsSameStr(longOptions[optionIndex].name, "show-gpumem")) {
         opts.showGpumem_ = true;
+    } else if (StringUtils::GetInstance().IsSameStr(longOptions[optionIndex].name, "fd")) {
+        opts.isDumpFd_ = true;
+    } else if (StringUtils::GetInstance().IsSameStr(longOptions[optionIndex].name, "thread")) {
+        opts.isDumpThread_ = true;
+    } else if (StringUtils::GetInstance().IsSameStr(longOptions[optionIndex].name, "all")) {
+        opts.isDumpFdThreadAll_ = true;
     } else if (StringUtils::GetInstance().IsSameStr(longOptions[optionIndex].name, "mem-jsheap")) {
         return SetMemJsheapParam(opts);
     } else if (StringUtils::GetInstance().IsSameStr(longOptions[optionIndex].name, "mem-cjheap")) {
@@ -873,6 +885,8 @@ void DumpImplement::CmdHelp()
         " and threads\n"
         "  -p [pid]                    |dump threads under pid, includes smap, block channel,"
         " execute time, mountinfo\n"
+        "  -p pid ARG [--all]          |dump thread or fd descriptor information;"
+        " ARG must be one of --thread | --fd; if --all is specified, dump all thread or fd descriptor information\n"
         "  --cpufreq                   |dump real CPU frequency of each core\n"
         "  --mem [pid] [--prune]       |dump memory usage of total; dump memory usage of specified"
         " pid if pid was specified; dump simplified memory information if prune is specified and not support"
