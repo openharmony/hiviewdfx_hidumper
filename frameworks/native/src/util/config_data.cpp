@@ -34,6 +34,7 @@ const std::string ConfigData::CONFIG_DUMPER_CJHEAP_MEMORY = ConfigData::CONFIG_D
 const std::string ConfigData::CONFIG_DUMPER_HEAP_MEMORY = ConfigData::CONFIG_DUMPER_ + "heap_memory";
 const std::string ConfigData::CONFIG_DUMPER_EVENT_LIST = ConfigData::CONFIG_DUMPER_ + "event_list";
 const std::string ConfigData::CONFIG_DUMPER_EVENT_DETAIL = ConfigData::CONFIG_DUMPER_ + "event_detail";
+const std::string ConfigData::CONFIG_DUMPER_FD_THREAD = ConfigData::CONFIG_DUMPER_ + "fd_thread";
 const std::string ConfigData::CONFIG_GROUP_IPC_STAT = ConfigData::CONFIG_GROUP_ + "ipc";
 const std::string ConfigData::CONFIG_GROUP_CPU_FREQ = ConfigData::CONFIG_GROUP_ + "cpufreq";
 const std::string ConfigData::CONFIG_GROUP_CPU_USAGE = ConfigData::CONFIG_GROUP_ + "cpuusage";
@@ -228,6 +229,17 @@ const ConfigData::ItemCfg ConfigData::eventDetailDumper_[] = {
     {
         CONFIG_DUMPER_EVENT_DETAIL, "event Detail Information", "", "",
         DumperConstant::EVENT_DETAIL_DUMPER, DumperConstant::NONE, DumperConstant::NONE, ""
+    },
+    {
+        "", "", "", "",
+        DumperConstant::FD_OUTPUT, DumperConstant::NONE, DumperConstant::NONE, ""
+    },
+};
+
+const ConfigData::ItemCfg ConfigData::fdThreadDumper_[] = {
+    {
+        CONFIG_DUMPER_FD_THREAD, "fd Thread Information", "", "",
+        DumperConstant::FD_THREAD_DUMPER, DumperConstant::NONE, DumperConstant::NONE, ""
     },
     {
         "", "", "", "",
@@ -886,6 +898,10 @@ const ConfigData::DumperCfg ConfigData::dumpers_[] = {
      .desc_ = eventDetailDumper_[0].desc_,
      .list_ = eventDetailDumper_,
      .size_ = ARRAY_SIZE(eventDetailDumper_)},
+    {.name_ = fdThreadDumper_[0].name_,
+     .desc_ = fdThreadDumper_[0].desc_,
+     .list_ = fdThreadDumper_,
+     .size_ = ARRAY_SIZE(fdThreadDumper_)},
     {.name_ = envDumper_[0].name_,
      .desc_ = envDumper_[0].desc_,
      .list_ = envDumper_,
