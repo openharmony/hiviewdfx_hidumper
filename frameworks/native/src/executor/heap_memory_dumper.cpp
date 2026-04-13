@@ -78,9 +78,11 @@ DumpStatus HeapMemoryDumper::AfterExecute()
         DUMPER_HILOGE(MODULE_SERVICE, "HeapMemoryDumper AfterExecute dumpDatas_ is nullptr");
         return DumpStatus::DUMP_FAIL;
     }
-    vector<string> result;
-    result.push_back(dumpResult_);
-    dumpDatas_->push_back(result);
+    if (needLeakobj_) {
+        vector<string> result;
+        result.push_back(dumpResult_);
+        dumpDatas_->push_back(result);
+    }
     return status_;
 }
 } // namespace HiviewDFX
