@@ -522,6 +522,11 @@ bool ConfigUtils::HandleDumpProcesses(std::vector<std::shared_ptr<DumpCfg>> &dum
     if (!dumperOpts.isDumpProcesses_) {
         return false;
     }
+    std::shared_ptr<OptionArgs> args;
+    if (dumperOpts.isDumpFd_ || dumperOpts.isDumpThread_) {
+        GetConfig(CONFIG_DUMPER_FD_THREAD, dumpCfgs, args);
+        return true;
+    }
 
     DUMPER_HILOGD(MODULE_COMMON, "debug|processes");
     currentPidInfo_.Reset();
@@ -538,7 +543,6 @@ bool ConfigUtils::HandleDumpProcesses(std::vector<std::shared_ptr<DumpCfg>> &dum
         MergePidInfos(currentPidInfos_, dumperOpts.processPid_);
     }
 
-    std::shared_ptr<OptionArgs> args;
     if (isUserMode) { // release mode
         if (dumperOpts.processPid_ < 0) {
             GetConfig(CONFIG_GROUP_PROCESSES, dumpCfgs, args);

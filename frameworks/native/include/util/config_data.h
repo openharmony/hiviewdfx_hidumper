@@ -67,6 +67,7 @@ public:
     static const std::string CONFIG_DUMPER_HEAP_MEMORY;
     static const std::string CONFIG_DUMPER_EVENT_LIST;
     static const std::string CONFIG_DUMPER_EVENT_DETAIL;
+    static const std::string CONFIG_DUMPER_FD_THREAD;
     static const std::string STR_ABILITY;
     static const std::string STR_BASE;
     static const std::string STR_SERVICE;
@@ -117,6 +118,7 @@ private:
     static const ItemCfg heapMemDumper_[];
     static const ItemCfg eventListDumper_[];
     static const ItemCfg eventDetailDumper_[];
+    static const ItemCfg fdThreadDumper_[];
     static const ItemCfg envDumper_[];
     static const ItemCfg kernelModuleDumper_[];
     static const ItemCfg dumpFormatVersionDumper_[];
