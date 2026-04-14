@@ -329,11 +329,10 @@ DumpStatus DumpImplement::CmdParseWithParameter(int argc, char *argv[], DumperOp
         }
         return DumpStatus::DUMP_HELP;
     }
-    if (CheckUnableToDumpAll(argc, opts)) {
-        CmdHelp();
-        return DumpStatus::DUMP_HELP;
+    if (opts.isDumpJsHeapMem_ && !CheckJsHeapSingleParam(opts)) {
+        return DumpStatus::DUMP_FAIL;
     }
-    if (opts.isDumpHeapMem_ && !CheckDumpHeapMemParameter(argc, opts)) {
+    if (CheckUnableToDumpAll(argc, opts) || (opts.isDumpHeapMem_ && !CheckDumpHeapMemParameter(argc, opts))) {
         CmdHelp();
         return DumpStatus::DUMP_HELP;
     }
@@ -1402,16 +1401,24 @@ bool DumpImplement::CheckDumpHeapMemParameter(int argc, DumperOpts& opt)
 
 DumpStatus DumpImplement::SetHeapCombineParam(DumperOpts &opt)
 {
-    if (!opt.dumpJsRawHeap_) {
-        DUMPER_HILOGE(MODULE_COMMON, "'--single' only used with '--raw'.");
-        return DumpStatus::DUMP_FAIL;
-    }
-    if (opt.threadId_ != 0 && opt.threadId_ != opt.dumpJsHeapMemPid_) {
-        DUMPER_HILOGE(MODULE_COMMON, "mem-jsheap param err, '--single' not need tid.");
-        return DumpStatus::DUMP_FAIL;
-    }
     opt.isDumpJsHeapCombine_ = true;
     return DumpStatus::DUMP_OK;
+}
+
+bool DumpImplement::CheckJsHeapSingleParam(const DumperOpts &opt)
+{
+    if (!opt.isDumpJsHeapCombine_) {
+        return true;
+    }
+    if (!opt.dumpJsRawHeap_) {
+        SendErrorMessage("mem-jsheap paramerr, '--single' only used with '--raw'.");
+        return false;
+    }
+    if (opt.threadId_ != 0) {
+        SendErrorMessage("mem-jsheap paramerr, '--single' not need 'tid'.");
+        return false;
+    }
+    return true;
 }
 } // namespace HiviewDFX
 } // namespace OHOS
