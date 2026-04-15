@@ -1090,5 +1090,122 @@ HWTEST_F(HiDumperManagerTest, HidumperRomTest001, TestSize.Level0)
     std::cout << "total realSize = " << realSize << std::endl;
     EXPECT_LT(realSize, BASELINE_SIZE * 1.05);
 }
+
+/**
+ * @tc.name: FdThreadDumpTest001
+ * @tc.desc: Test --fd command has correct ret.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HiDumperManagerTest, FdThreadDumpTest001, TestSize.Level0)
+{
+    char *argv[] = {
+        const_cast<char *>(TOOL_NAME.c_str()),
+        const_cast<char *>("-p"),
+        const_cast<char *>(std::to_string(getpid()).c_str()),
+        const_cast<char *>("--fd"),
+        const_cast<char *>(""),
+    };
+    int argc = sizeof(argv) / sizeof(argv[0]) - 1;
+    int ret = GetDumpResult(argc, argv);
+    ASSERT_EQ(ret, DumpStatus::DUMP_OK);
+}
+
+/**
+ * @tc.name: FdThreadDumpTest002
+ * @tc.desc: Test --thread command has correct ret.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HiDumperManagerTest, FdThreadDumpTest002, TestSize.Level0)
+{
+    char *argv[] = {
+        const_cast<char *>(TOOL_NAME.c_str()),
+        const_cast<char *>("-p"),
+        const_cast<char *>(std::to_string(getpid()).c_str()),
+        const_cast<char *>("--thread"),
+        const_cast<char *>(""),
+    };
+    int argc = sizeof(argv) / sizeof(argv[0]) - 1;
+    int ret = GetDumpResult(argc, argv);
+    ASSERT_EQ(ret, DumpStatus::DUMP_OK);
+}
+
+/**
+ * @tc.name: FdThreadDumpTest003
+ * @tc.desc: Test --fd -v command has correct ret.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HiDumperManagerTest, FdThreadDumpTest003, TestSize.Level0)
+{
+    char *argv[] = {
+        const_cast<char *>(TOOL_NAME.c_str()),
+        const_cast<char *>("-p"),
+        const_cast<char *>(std::to_string(getpid()).c_str()),
+        const_cast<char *>("--fd"),
+        const_cast<char *>("-v"),
+        const_cast<char *>(""),
+    };
+    int argc = sizeof(argv) / sizeof(argv[0]) - 1;
+    int ret = GetDumpResult(argc, argv);
+    ASSERT_EQ(ret, DumpStatus::DUMP_OK);
+}
+
+/**
+ * @tc.name: FdThreadDumpTest004
+ * @tc.desc: Test --thread -v command has correct ret.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HiDumperManagerTest, FdThreadDumpTest004, TestSize.Level0)
+{
+    char *argv[] = {
+        const_cast<char *>(TOOL_NAME.c_str()),
+        const_cast<char *>("-p"),
+        const_cast<char *>(std::to_string(getpid()).c_str()),
+        const_cast<char *>("--thread"),
+        const_cast<char *>("-v"),
+        const_cast<char *>(""),
+    };
+    int argc = sizeof(argv) / sizeof(argv[0]) - 1;
+    int ret = GetDumpResult(argc, argv);
+    ASSERT_EQ(ret, DumpStatus::DUMP_OK);
+}
+
+/**
+ * @tc.name: FdThreadDumpTest005
+ * @tc.desc: Test --fd and --thread cannot be used together.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HiDumperManagerTest, FdThreadDumpTest005, TestSize.Level0)
+{
+    char *argv[] = {
+        const_cast<char *>(TOOL_NAME.c_str()),
+        const_cast<char *>("-p"),
+        const_cast<char *>(std::to_string(getpid()).c_str()),
+        const_cast<char *>("--fd"),
+        const_cast<char *>("--thread"),
+        const_cast<char *>(""),
+    };
+    int argc = sizeof(argv) / sizeof(argv[0]) - 1;
+    int ret = GetDumpResult(argc, argv);
+    ASSERT_EQ(ret, DumpStatus::DUMP_INVALID_ARG);
+}
+
+/**
+ * @tc.name: FdThreadDumpTest006
+ * @tc.desc: Test invalid pid with --fd command.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HiDumperManagerTest, FdThreadDumpTest006, TestSize.Level0)
+{
+    char *argv[] = {
+        const_cast<char *>(TOOL_NAME.c_str()),
+        const_cast<char *>("-p"),
+        const_cast<char *>("999999"),
+        const_cast<char *>("--fd"),
+        const_cast<char *>(""),
+    };
+    int argc = sizeof(argv) / sizeof(argv[0]) - 1;
+    int ret = GetDumpResult(argc, argv);
+    ASSERT_EQ(ret, DumpStatus::DUMP_FAIL);
+}
 } // namespace HiviewDFX
 } // namespace OHOS

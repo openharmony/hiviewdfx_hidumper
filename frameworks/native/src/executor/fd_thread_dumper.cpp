@@ -32,7 +32,7 @@ DumpStatus FdThreadDumper::PreExecute(const shared_ptr<DumperParameter> &paramet
 {
     isDumpFd_ = parameter->GetOpts().isDumpFd_;
     isDumpThread_ = parameter->GetOpts().isDumpThread_;
-    isDumpFdThreadAll_ = parameter->GetOpts().isDumpFdThreadAll_;
+    isDumpFdThreadAll_ = parameter->GetOpts().isShowSmapsInfo_;
     processPid_ = parameter->GetOpts().processPid_;
     dumpDatas_ = dumpDatas;
     return DumpStatus::DUMP_OK;
@@ -364,8 +364,17 @@ bool FdThreadDumper::IsNumericStr(const string &str)
 size_t FdThreadDumper::FindFdClusterStartIndex(const string &fullFileName)
 {
     size_t fileNameSize = fullFileName.size();
-    for (size_t i = 0; i < fileNameSize; i++) {
-        if (isdigit(fullFileName[i])) {
+    if (fullFileName.compare(0, STORAGE_PATH_SIZE, STORAGE_PATH_PREFIX) != 0 ||
+        !std::isdigit(fullFileName[STORAGE_PATH_SIZE])) {
+        for (size_t i = 0; i < fileNameSize; i++) {
+            if (std::isdigit(fullFileName[i])) {
+                return i;
+            }
+        }
+        return fileNameSize;
+    }
+    for (size_t i = STORAGE_PATH_SIZE + 1; i < fileNameSize; i++) {
+        if (std::isdigit(fullFileName[i])) {
             return i;
         }
     }
