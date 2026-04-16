@@ -88,7 +88,6 @@ static struct option LONG_OPTIONS[] = {{"cpufreq", no_argument, 0, 0},
     {"until", required_argument, 0, 0},
     {"fd", no_argument, 0, 0},
     {"thread", no_argument, 0, 0},
-    {"all", no_argument, 0, 0},
     {0, 0, 0, 0}};
 
 thread_local std::unique_ptr<DumperSysEventParams> DumpImplement::dumperSysEventParams_{nullptr};
@@ -552,8 +551,6 @@ DumpStatus DumpImplement::ParseLongCmdOption(int argc, DumperOpts &opts, const s
         opts.isDumpFd_ = true;
     } else if (StringUtils::GetInstance().IsSameStr(longOptions[optionIndex].name, "thread")) {
         opts.isDumpThread_ = true;
-    } else if (StringUtils::GetInstance().IsSameStr(longOptions[optionIndex].name, "all")) {
-        opts.isDumpFdThreadAll_ = true;
     } else if (StringUtils::GetInstance().IsSameStr(longOptions[optionIndex].name, "mem-jsheap")) {
         return SetMemJsheapParam(opts);
     } else if (StringUtils::GetInstance().IsSameStr(longOptions[optionIndex].name, "mem-cjheap")) {
@@ -894,8 +891,8 @@ void DumpImplement::CmdHelp()
         " and threads\n"
         "  -p [pid]                    |dump threads under pid, includes smap, block channel,"
         " execute time, mountinfo\n"
-        "  -p pid ARG [--all]          |dump thread or fd descriptor information;"
-        " ARG must be one of --thread | --fd; if --all is specified, dump all thread or fd descriptor information\n"
+        "  -p pid ARG [-v]             |dump thread or fd descriptor information;"
+        " ARG must be one of --thread | --fd; use -v to dump all thread or fd descriptor information\n"
         "  --cpufreq                   |dump real CPU frequency of each core\n"
         "  --mem [pid] [--prune]       |dump memory usage of total; dump memory usage of specified"
         " pid if pid was specified; dump simplified memory information if prune is specified and not support"
