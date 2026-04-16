@@ -485,5 +485,69 @@ HWTEST_F(HidumperClientTest, ManagerClientTest016, TestSize.Level0)
     int ret = DumpManagerClient::GetInstance().Request(args, STDOUT_FILENO);
     ASSERT_EQ(ret, DumpStatus::DUMP_OK);
 }
+
+/**
+ * @tc.name: ManagerClientTest017
+ * @tc.desc: Test --mem-heap.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HidumperClientTest, ManagerClientTest017, TestSize.Level0)
+{
+    vector<u16string> args{
+        std::u16string(u"hidumper"),
+        std::u16string(u"--mem-heap"),
+    };
+    int ret = DumpManagerClient::GetInstance().Request(args, STDOUT_FILENO);
+    ASSERT_EQ(ret, DumpStatus::DUMP_OK);
+}
+
+/**
+ * @tc.name: ManagerClientTest018
+ * @tc.desc: Test --mem-heap pid --native.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HidumperClientTest, ManagerClientTest018, TestSize.Level0)
+{
+    string pid;
+    auto appMgrClient = std::make_unique<AppMgrClient>();
+    std::vector<RunningProcessInfo> runningProcessInfos;
+    appMgrClient->GetAllRunningProcesses(runningProcessInfos);
+    ASSERT_TRUE(runningProcessInfos.size() > 0);
+
+    pid = to_string(runningProcessInfos[0].pid_);
+    vector<u16string> args{
+        std::u16string(u"hidumper"),
+        std::u16string(u"--mem-heap"),
+        Str8ToStr16(pid),
+        std::u16string(u"--native"),
+    };
+    int ret = DumpManagerClient::GetInstance().Request(args, STDOUT_FILENO);
+    ASSERT_EQ(ret, DumpStatus::DUMP_OK);
+}
+
+/**
+ * @tc.name: ManagerClientTest019
+ * @tc.desc: Test --mem-heap pid --native --leakobj.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HidumperClientTest, ManagerClientTest019, TestSize.Level0)
+{
+    string pid;
+    auto appMgrClient = std::make_unique<AppMgrClient>();
+    std::vector<RunningProcessInfo> runningProcessInfos;
+    appMgrClient->GetAllRunningProcesses(runningProcessInfos);
+    ASSERT_TRUE(runningProcessInfos.size() > 0);
+
+    pid = to_string(runningProcessInfos[0].pid_);
+    vector<u16string> args{
+        std::u16string(u"hidumper"),
+        std::u16string(u"--mem-heap"),
+        Str8ToStr16(pid),
+        std::u16string(u"--native"),
+        std::u16string(u"--leakobj"),
+    };
+    int ret = DumpManagerClient::GetInstance().Request(args, STDOUT_FILENO);
+    ASSERT_EQ(ret, DumpStatus::DUMP_OK);
+}
 } // namespace HiviewDFX
 } // namespace OHOS

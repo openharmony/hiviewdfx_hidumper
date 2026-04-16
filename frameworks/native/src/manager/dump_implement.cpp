@@ -657,7 +657,6 @@ DumpStatus DumpImplement::SetRawParam(DumperOpts &opt)
         dumperSysEventParams_->opt = "mem-jsrawheap";
         status = DumpStatus::DUMP_OK;
     }
-
     return status;
 }
 
