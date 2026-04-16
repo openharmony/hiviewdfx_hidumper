@@ -651,6 +651,11 @@ DumpStatus DumpImplement::SetNativeParam(DumperOpts &opt)
         DUMPER_HILOGI(MODULE_COMMON, "SetNativeParam success");
         opt.isDumpHeapNative_ = true;
         status = DumpStatus::DUMP_OK;
+    } else {
+        DUMPER_HILOGE(MODULE_COMMON, "native param invalid");
+        SendErrorMessage("native param invalid\n");
+        CmdHelp();
+        status = DumpStatus::DUMP_HELP;
     }
     return status;
 }
@@ -701,6 +706,11 @@ DumpStatus DumpImplement::SetLeakobjParam(DumperOpts &opt)
         DUMPER_HILOGI(MODULE_COMMON, "SetLeakobjParam success");
         opt.isDumpHeapLeakobj_ = true;
         status = DumpStatus::DUMP_OK;
+    } else {
+        DUMPER_HILOGE(MODULE_COMMON, "leakobj param invalid");
+        SendErrorMessage("leakobj param invalid\n");
+        CmdHelp();
+        status = DumpStatus::DUMP_HELP;
     }
     return status;
 }
