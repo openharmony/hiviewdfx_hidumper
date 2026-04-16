@@ -34,6 +34,8 @@ namespace HiviewDFX {
 constexpr size_t FD_TOP_CNT = 10;
 constexpr int FD_PATH_MAX = 4096;
 constexpr size_t START_TIME_FIELD_INDEX = 19;
+static const std::string STORAGE_PATH_PREFIX = "/data/storage/el";
+static const size_t STORAGE_PATH_SIZE = STORAGE_PATH_PREFIX.size();
 
 class FdThreadDumper : public HidumperExecutor {
 public:

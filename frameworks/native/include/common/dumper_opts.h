@@ -80,7 +80,6 @@ struct DumperOpts {
     bool isEventDetail_;
     bool isDumpFd_;
     bool isDumpThread_;
-    bool isDumpFdThreadAll_;
 
 public:
     DumperOpts();

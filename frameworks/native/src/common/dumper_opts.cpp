@@ -154,7 +154,6 @@ void DumperOpts::ResetMiscOptions()
     threadId_ = 0;
     isDumpFd_ = false;
     isDumpThread_ = false;
-    isDumpFdThreadAll_ = false;
 }
 
 DumperOpts& DumperOpts::operator=(const DumperOpts& opts)
@@ -281,7 +280,6 @@ void DumperOpts::AssignMiscOptions(const DumperOpts& opts)
     threadId_ = opts.threadId_;
     isDumpFd_ = opts.isDumpFd_;
     isDumpThread_ = opts.isDumpThread_;
-    isDumpFdThreadAll_ = opts.isDumpFdThreadAll_;
 }
 
 void DumperOpts::AddSelectAll()
@@ -400,6 +398,10 @@ bool DumperOpts::CheckOptions(std::string& errStr) const
     }
     if (isEventDetail_ && isEventList_) {
         errStr = "--list and --detail cannot be used together";
+        return false;
+    }
+    if (isDumpFd_ && isDumpThread_) {
+        errStr = "--fd and --thread cannot be used together";
         return false;
     }
     std::string path = TrimStr(path_);
