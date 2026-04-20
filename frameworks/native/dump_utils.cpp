@@ -56,6 +56,7 @@ inline const std::map<int, std::string> saNameMap_ = {
     { 301, "AIEngine" },
     { ABILITY_MGR_SERVICE_ID, "AbilityManagerService" },
     { AGENT_MGR_SERVICE_ID, "AgentManagerService" },
+    { CLI_TOOL_MGR_SERVICE_ID, "CliToolManagerService" },
     { DATAOBS_MGR_SERVICE_SA_ID, "DataObserverMgr" },
     { APP_MGR_SERVICE_ID, "ApplicationManagerService" },
     { URI_PERMISSION_MGR_SERVICE_ID, "UriPermissionMgr" },
