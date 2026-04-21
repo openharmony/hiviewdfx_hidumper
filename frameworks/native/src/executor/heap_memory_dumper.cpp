@@ -32,10 +32,13 @@ AppExecFwk::MemDumpType HeapMemoryDumper::DetermineDumpType(
 {
     bool isKotlin = parameter->GetOpts().isDumpHeapKotlin_;
     bool isNative = parameter->GetOpts().isDumpHeapNative_;
+    bool isJsvm = parameter->GetOpts().isDumpHeapJsvm_;
     if (isKotlin) {
         return AppExecFwk::MemDumpType::KMP_KOTLIN;
     } else if (isNative) {
         return AppExecFwk::MemDumpType::NATIVE;
+    } else if (isJsvm) {
+        return AppExecFwk::MemDumpType::Jsvm;
     }
     return AppExecFwk::MemDumpType::INVALID;
 }
