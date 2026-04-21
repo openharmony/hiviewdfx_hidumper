@@ -70,6 +70,7 @@ static struct option LONG_OPTIONS[] = {{"cpufreq", no_argument, 0, 0},
     {"mem-heap", optional_argument, 0, 0},
     {"native", optional_argument, 0, 0},
     {"kmp-kotlin", optional_argument, 0, 0},
+    {"jsvm", optional_argument, 0, 0},
     {"gc", no_argument, 0, 0},
     {"leakobj", no_argument, 0, 0},
     {"clean", no_argument, 0, 0},
@@ -429,6 +430,8 @@ DumpStatus DumpImplement::HandleOptionParameter(const std::string &optionName,
         status = SetCmdIntegerParameter(optionValue, opts.dumpHeapArgPid_);
     } else if (optionName == "--kmp-kotlin") {
         status = SetCmdIntegerParameter(optionValue, opts.dumpHeapArgPid_);
+    } else if (optionName == "--jsvm") {
+        status = SetCmdIntegerParameter(optionValue, opts.dumpHeapArgPid_);
     } else {
         SendErrorMessageIf(opts, optionValue);
         return DumpStatus::DUMP_FAIL;
@@ -568,6 +571,8 @@ DumpStatus DumpImplement::ParseLongCmdOption(int argc, DumperOpts &opts, const s
         return SetNativeParam(opts);
     } else if (StringUtils::GetInstance().IsSameStr(longOptions[optionIndex].name, "kmp-kotlin")) {
         return SetKotlinParam(opts);
+    } else if (StringUtils::GetInstance().IsSameStr(longOptions[optionIndex].name, "jsvm")) {
+        return SetJsvmParam(opts);
     } else if (StringUtils::GetInstance().IsSameStr(longOptions[optionIndex].name, "raw")) {
         return SetRawParam(opts);
     } else if (StringUtils::GetInstance().IsSameStr(longOptions[optionIndex].name, "prune")) {
@@ -672,6 +677,22 @@ DumpStatus DumpImplement::SetKotlinParam(DumperOpts &opt)
     } else {
         DUMPER_HILOGE(MODULE_COMMON, "kmp-kotlin param invalid");
         SendErrorMessage("kmp-kotlin param invalid\n");
+        CmdHelp();
+        status =  DumpStatus::DUMP_HELP;
+    }
+    return status;
+}
+
+DumpStatus DumpImplement::SetJsvmParam(DumperOpts &opt)
+{
+    DumpStatus status = DumpStatus::DUMP_FAIL;
+    if (opt.isDumpHeapMem_) {
+        DUMPER_HILOGI(MODULE_COMMON, "SetJsvmParam success");
+        opt.isDumpHeapJsvm_ = true;
+        status = DumpStatus::DUMP_OK;
+    } else {
+        DUMPER_HILOGE(MODULE_COMMON, "jsvm param invalid");
+        SendErrorMessage("jsvm param invalid\n");
         CmdHelp();
         status =  DumpStatus::DUMP_HELP;
     }
@@ -929,7 +950,7 @@ void DumpImplement::CmdHelp()
         " dumpRawHeap and dumpLeakList under pid and tid\n"
         "  --mem-cjheap pid [--gc]     |the pid should belong to the Cangjie process; triggerGC and"
         " dumpHeapSnapshot under pid\n"
-        "  --mem-heap pid ARG [--leakobj]  |ARG must be one of --native or --kmp-kotlin.\n"
+        "  --mem-heap pid ARG [--leakobj]  |ARG must be one of --native or --kmp-kotlin or --jsvm.\n"
         "  --ipc pid ARG               |ipc load statistic; pid must be specified or set to -a dump all"
         " processes. ARG must be one of --start-stat | --stop-stat | --stat\n";
 
@@ -1350,6 +1371,8 @@ void DumpImplement::ReportMemheap(const DumperOpts &opts)
         strType = "hidumperKmpHeap";
     } else if (opts.isDumpHeapNative_) {
         strType = "hidumperNativeHeap";
+    } else if (opts.isDumpHeapJsvm_) {
+        strType = "hidumperJsvmHeap";
     } else {
         return;
     }
@@ -1436,7 +1459,7 @@ bool DumpImplement::CheckDumpHeapMemParameter(int argc, DumperOpts& opt)
     bool validArgc = argc >= ARG_COUNT_HEAP_MEM;
     bool validPid = (opt.dumpHeapMemPid_ > 0 && opt.dumpHeapArgPid_ == 0) ||
         (opt.dumpHeapMemPid_ == 0 && opt.dumpHeapArgPid_ > 0);
-    bool validArg = (opt.isDumpHeapNative_ + opt.isDumpHeapKotlin_ == 1);
+    bool validArg = (opt.isDumpHeapNative_ + opt.isDumpHeapKotlin_ + opt.isDumpHeapJsvm_ == 1);
     DUMPER_HILOGI(MODULE_COMMON, "CheckDumpHeapMemParameter %{public}d", validArgc && validPid && validArg);
     return validArgc && validPid && validArg;
 }

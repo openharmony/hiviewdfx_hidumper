@@ -60,6 +60,7 @@ struct DumperOpts {
     bool isDumpHeapMem_;
     bool isDumpHeapNative_;
     bool isDumpHeapKotlin_;
+    bool isDumpHeapJsvm_;
     bool isDumpHeapLeakobj_;
     int dumpHeapMemPid_;
     int dumpHeapArgPid_;
