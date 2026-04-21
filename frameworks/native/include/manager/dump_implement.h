@@ -113,6 +113,7 @@ private:
     DumpStatus SetMemCjheapParam(DumperOpts &opt);
     DumpStatus SetMemHeapParam(DumperOpts &opt);
     DumpStatus SetNativeParam(DumperOpts &opt);
+    DumpStatus SetKotlinParam(DumperOpts &opt);
     DumpStatus SetRawParam(DumperOpts &opt);
     DumpStatus SetMemPruneParam(DumperOpts &opt);
     DumpStatus SetGCParam(DumperOpts &opt);
