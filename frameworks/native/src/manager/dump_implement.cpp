@@ -706,6 +706,15 @@ DumpStatus DumpImplement::SetRawParam(DumperOpts &opt)
         opt.dumpJsRawHeap_ = true;
         dumperSysEventParams_->opt = "mem-jsrawheap";
         status = DumpStatus::DUMP_OK;
+    } else if (opt.isDumpHeapMem_) {
+        opt.dumpRawHeap_ = true;
+        dumperSysEventParams_->opt = "mem-rawheap";
+        status = DumpStatus::DUMP_OK;
+    } else {
+        DUMPER_HILOGE(MODULE_COMMON, "raw param invalid");
+        SendErrorMessage("raw param invalid\n");
+        CmdHelp();
+        status =  DumpStatus::DUMP_HELP;
     }
 
     return status;
@@ -950,7 +959,7 @@ void DumpImplement::CmdHelp()
         " dumpRawHeap and dumpLeakList under pid and tid\n"
         "  --mem-cjheap pid [--gc]     |the pid should belong to the Cangjie process; triggerGC and"
         " dumpHeapSnapshot under pid\n"
-        "  --mem-heap pid ARG [--leakobj]  |ARG must be one of --native or --kmp-kotlin or --jsvm.\n"
+        "  --mem-heap pid ARG [--leakobj] [--raw] [-T tid] |ARG must be one of --native or --kmp-kotlin or --jsvm.\n"
         "  --ipc pid ARG               |ipc load statistic; pid must be specified or set to -a dump all"
         " processes. ARG must be one of --start-stat | --stop-stat | --stat\n";
 
