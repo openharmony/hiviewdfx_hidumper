@@ -55,6 +55,7 @@ DumpStatus HeapMemoryDumper::PreExecute(const shared_ptr<DumperParameter> &param
     } else {
         pid_ = parameter->GetOpts().dumpHeapMemPid_;
     }
+    tid_ = parameter->GetOpts().threadId_;
     dumpDatas_ = dumpDatas;
     dumpType_ = DetermineDumpType(parameter);
     return DumpStatus::DUMP_OK;
@@ -64,6 +65,7 @@ DumpStatus HeapMemoryDumper::Execute()
 {
     OHOS::AppExecFwk::MemDumpInfo info;
     info.pid = pid_;
+    info.tid = tid_;
     info.dumpType = dumpType_;
     info.needLeakobj = needLeakobj_;
     info.mayReportToOEM = false;

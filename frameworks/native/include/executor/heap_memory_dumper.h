@@ -41,6 +41,7 @@ private:
     bool needLeakobj_ = false;
     std::string dumpResult_;
     int pid_ = 0;
+    int tid_ = 0;
 };
 } // namespace HiviewDFX
 } // namespace OHOS
