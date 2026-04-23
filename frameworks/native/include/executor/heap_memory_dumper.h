@@ -39,6 +39,7 @@ private:
     std::unique_ptr<DumpHeapInfo> heapInfo_;
     AppExecFwk::MemDumpType dumpType_ = AppExecFwk::MemDumpType::INVALID;
     bool needLeakobj_ = false;
+    bool needRaw_ = false;
     std::string dumpResult_;
     int pid_ = 0;
     int tid_ = 0;

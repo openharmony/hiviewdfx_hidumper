@@ -50,6 +50,7 @@ DumpStatus HeapMemoryDumper::PreExecute(const shared_ptr<DumperParameter> &param
         return DumpStatus::DUMP_FAIL;
     }
     needLeakobj_ = parameter->GetOpts().isDumpHeapLeakobj_;
+    needRaw_ = parameter->GetOpts().dumpRawHeap_;
     if (parameter->GetOpts().dumpHeapArgPid_ > 0) {
         pid_ = parameter->GetOpts().dumpHeapArgPid_;
     } else {
@@ -68,6 +69,7 @@ DumpStatus HeapMemoryDumper::Execute()
     info.tid = tid_;
     info.dumpType = dumpType_;
     info.needLeakobj = needLeakobj_;
+    info.needRaw = needRaw_;
     info.mayReportToOEM = false;
 
     if (info.dumpType == AppExecFwk::MemDumpType::NATIVE && info.needLeakobj) {
