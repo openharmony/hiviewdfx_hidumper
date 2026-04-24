@@ -1349,6 +1349,12 @@ bool DumpImplement::CheckDumpPermission(DumperOpts& opt)
 {
     bool isUserMode = DumpUtils::IsUserMode();
     DUMPER_HILOGD(MODULE_COMMON, "debug|isUserMode %{public}d", isUserMode);
+    if ((opt.isDumpFd_ || opt.isDumpThread_) && opt.processPid_ <= 0) {
+        SendErrorMessage(invalidError_ + "--fd/--thread requires -p PID");
+        DUMPER_HILOGE(MODULE_COMMON, "Fd/Thread dump requires pid, isUserMode:%{public}d, processPid_:%{public}d",
+            isUserMode, opt.processPid_);
+        return false;
+    }
     if (!isUserMode) {
         return true;
     }
