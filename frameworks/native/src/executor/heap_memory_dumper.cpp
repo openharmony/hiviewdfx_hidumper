@@ -38,7 +38,7 @@ AppExecFwk::MemDumpType HeapMemoryDumper::DetermineDumpType(
     } else if (isNative) {
         return AppExecFwk::MemDumpType::NATIVE;
     } else if (isJsvm) {
-        return AppExecFwk::MemDumpType::Jsvm;
+        return AppExecFwk::MemDumpType::JSVM;
     }
     return AppExecFwk::MemDumpType::INVALID;
 }
