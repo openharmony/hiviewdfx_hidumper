@@ -1246,5 +1246,41 @@ HWTEST_F(HiDumperManagerTest, FdThreadDumpTest006, TestSize.Level0)
     int ret = GetDumpResult(argc, argv);
     ASSERT_EQ(ret, DumpStatus::DUMP_FAIL);
 }
+
+/**
+ * @tc.name: FdThreadDumpTest007
+ * @tc.desc: Test --fd with -p but no PID argument should return DUMP_HELP.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HiDumperManagerTest, FdThreadDumpTest007, TestSize.Level0)
+{
+    char *argv[] = {
+        const_cast<char *>(TOOL_NAME.c_str()),
+        const_cast<char *>("-p"),
+        const_cast<char *>("--fd"),
+        const_cast<char *>(""),
+    };
+    int argc = sizeof(argv) / sizeof(argv[0]) - 1;
+    int ret = GetDumpResult(argc, argv);
+    ASSERT_EQ(ret, DumpStatus::DUMP_HELP);
+}
+
+/**
+ * @tc.name: FdThreadDumpTest008
+ * @tc.desc: Test --thread with -p but no PID argument should return DUMP_HELP.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HiDumperManagerTest, FdThreadDumpTest008, TestSize.Level0)
+{
+    char *argv[] = {
+        const_cast<char *>(TOOL_NAME.c_str()),
+        const_cast<char *>("-p"),
+        const_cast<char *>("--thread"),
+        const_cast<char *>(""),
+    };
+    int argc = sizeof(argv) / sizeof(argv[0]) - 1;
+    int ret = GetDumpResult(argc, argv);
+    ASSERT_EQ(ret, DumpStatus::DUMP_HELP);
+}
 } // namespace HiviewDFX
 } // namespace OHOS
