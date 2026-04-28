@@ -23,6 +23,7 @@
 #include "executor/ipc_stat_dumper.h"
 #include "executor/jsheap_memory_dumper.h"
 #include "executor/cjheap_memory_dumper.h"
+#include "executor/heap_memory_dumper.h"
 #include "executor/list_dumper.h"
 #include "executor/sa_dumper.h"
 #include "executor/version_dumper.h"
@@ -1067,6 +1068,59 @@ HWTEST_F(HidumperDumpersTest, CjHeapDumperTest004, TestSize.Level1)
     std::shared_ptr<RawParam> rawParam = std::make_shared<RawParam>(0, 1, 0, args, -1);
     int ret = DumpImplement::GetInstance().Main(argc, argv, rawParam);
     ASSERT_EQ(ret, DumpStatus::DUMP_HELP);
+}
+
+/**
+ * @tc.name: NativeHeapDumperTest001
+ * @tc.desc: Test NativeHeapDumper with init pid and dump nativeleaklist
+ * @tc.type: FUNC
+ */
+HWTEST_F(HidumperDumpersTest, NativeHeapDumperTest001, TestSize.Level1)
+{
+    char *argv[] = {
+        const_cast<char *>("hidumper"),
+        const_cast<char *>("--mem-heap"),
+        const_cast<char *>("1"),
+        const_cast<char *>("--native"),
+    };
+    int argc = sizeof(argv) / sizeof(argv[0]);
+    std::vector<std::u16string> args;
+    std::shared_ptr<RawParam> rawParam = std::make_shared<RawParam>(0, 1, 0, args, -1);
+    int ret = DumpImplement::GetInstance().Main(argc, argv, rawParam);
+    ASSERT_EQ(ret, DumpStatus::DUMP_OK);
+}
+
+/**
+ * @tc.name: NativeHeapDumperTest002
+ * @tc.desc: Test NativeHeapDumper with init pid and trigger native and leakobj.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HidumperDumpersTest, NativeHeapDumperTest002, TestSize.Level1)
+{
+    char *argv[] = {
+        const_cast<char *>("hidumper"),
+        const_cast<char *>("--mem-heap"),
+        const_cast<char *>("1"),
+        const_cast<char *>("--native"),
+        const_cast<char *>("--leakobj"),
+    };
+    int argc = sizeof(argv) / sizeof(argv[0]);
+    std::vector<std::u16string> args;
+    std::shared_ptr<RawParam> rawParam = std::make_shared<RawParam>(0, 1, 0, args, -1);
+    int ret = DumpImplement::GetInstance().Main(argc, argv, rawParam);
+    ASSERT_EQ(ret, DumpStatus::DUMP_OK);
+}
+
+/**
+ * @tc.name: NativeHeapDumperTest003
+ * @tc.desc: Test NativeHeapDumper with nullptr parameter.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HidumperDumpersTest, NativeHeapDumperTest003, TestSize.Level1)
+{
+    auto NativeHeapDumper = std::make_unique<HeapMemoryDumper>();
+    DumpStatus ret = NativeHeapDumper->PreExecute(nullptr, g_dump_datas);
+    ASSERT_EQ(ret, DumpStatus::DUMP_FAIL);
 }
 
 /**

@@ -69,7 +69,6 @@ static struct option LONG_OPTIONS[] = {{"cpufreq", no_argument, 0, 0},
     {"mem-cjheap", required_argument, 0, 0},
     {"mem-heap", optional_argument, 0, 0},
     {"native", optional_argument, 0, 0},
-    {"kmp-kotlin", optional_argument, 0, 0},
     {"jsvm", optional_argument, 0, 0},
     {"gc", no_argument, 0, 0},
     {"leakobj", no_argument, 0, 0},
@@ -79,7 +78,9 @@ static struct option LONG_OPTIONS[] = {{"cpufreq", no_argument, 0, 0},
     {"prune", no_argument, 0, 0},
     {"show-ashmem", no_argument, 0, 0},
     {"show-dmabuf", no_argument, 0, 0},
+    #ifdef HIDUMPER_HIVIEWDFX_PLUGIN_ENABLE
     {"show-gpumem", no_argument, 0, 0},
+    #endif
     {"ipc", optional_argument, 0, 0},
     {"start-stat", no_argument, 0, 0},
     {"stop-stat", no_argument, 0, 0},
@@ -428,7 +429,7 @@ DumpStatus DumpImplement::HandleOptionParameter(const std::string &optionName,
         status = SetCmdIntegerParameter(optionValue, opts.dumpHeapMemPid_);
     } else if (optionName == "--native") {
         status = SetCmdIntegerParameter(optionValue, opts.dumpHeapArgPid_);
-    } else if (optionName == "--kmp-kotlin") {
+    } else if (optionName == "--kotlin") {
         status = SetCmdIntegerParameter(optionValue, opts.dumpHeapArgPid_);
     } else if (optionName == "--jsvm") {
         status = SetCmdIntegerParameter(optionValue, opts.dumpHeapArgPid_);
@@ -555,9 +556,13 @@ DumpStatus DumpImplement::ParseLongCmdOption(int argc, DumperOpts &opts, const s
         opts.showAshmem_ = true;
     } else if (StringUtils::GetInstance().IsSameStr(longOptions[optionIndex].name, "show-dmabuf")) {
         opts.showDmaBuf_ = true;
-    } else if (StringUtils::GetInstance().IsSameStr(longOptions[optionIndex].name, "show-gpumem")) {
+    } 
+    #ifdef HIDUMPER_HIVIEWDFX_PLUGIN_ENABLE
+    else if (StringUtils::GetInstance().IsSameStr(longOptions[optionIndex].name, "show-gpumem")) {
         opts.showGpumem_ = true;
-    } else if (StringUtils::GetInstance().IsSameStr(longOptions[optionIndex].name, "fd")) {
+    } 
+    #endif
+    else if (StringUtils::GetInstance().IsSameStr(longOptions[optionIndex].name, "fd")) {
         opts.isDumpFd_ = true;
     } else if (StringUtils::GetInstance().IsSameStr(longOptions[optionIndex].name, "thread")) {
         opts.isDumpThread_ = true;
@@ -569,7 +574,7 @@ DumpStatus DumpImplement::ParseLongCmdOption(int argc, DumperOpts &opts, const s
         return SetMemHeapParam(opts);
     } else if (StringUtils::GetInstance().IsSameStr(longOptions[optionIndex].name, "native")) {
         return SetNativeParam(opts);
-    } else if (StringUtils::GetInstance().IsSameStr(longOptions[optionIndex].name, "kmp-kotlin")) {
+    } else if (StringUtils::GetInstance().IsSameStr(longOptions[optionIndex].name, "kotlin")) {
         return SetKotlinParam(opts);
     } else if (StringUtils::GetInstance().IsSameStr(longOptions[optionIndex].name, "jsvm")) {
         return SetJsvmParam(opts);
@@ -675,8 +680,8 @@ DumpStatus DumpImplement::SetKotlinParam(DumperOpts &opt)
         opt.isDumpHeapKotlin_ = true;
         status = DumpStatus::DUMP_OK;
     } else {
-        DUMPER_HILOGE(MODULE_COMMON, "kmp-kotlin param invalid");
-        SendErrorMessage("kmp-kotlin param invalid\n");
+        DUMPER_HILOGE(MODULE_COMMON, "kotlin param invalid");
+        SendErrorMessage("kotlin param invalid\n");
         CmdHelp();
         status =  DumpStatus::DUMP_HELP;
     }
@@ -716,7 +721,6 @@ DumpStatus DumpImplement::SetRawParam(DumperOpts &opt)
         CmdHelp();
         status =  DumpStatus::DUMP_HELP;
     }
-
     return status;
 }
 
@@ -950,7 +954,9 @@ void DumpImplement::CmdHelp()
         " dumped simplified memory information of specified pid\n"
         "  --mem [pid] [--show-ashmem]   |show ashmem info when dumping memory of specified pid\n"
         "  --mem [pid] [--show-dmabuf]   |show dmabuf info when dumping memory of specified pid\n"
+        #ifdef HIDUMPER_HIVIEWDFX_PLUGIN_ENABLE
         "  --mem [pid] [--show-gpumem]   |show gpumem info when dumping memory of specified pid\n"
+        #endif
         "  --mem [pid] -t [timeInterval]  |dump process memory change information, press Ctrl+C to stop the export."
         " detail information is stored in /data/log/hidumper/record_mem.txt.\n"
         "  --zip                       |compress output to /data/log/hidumper\n"
@@ -959,7 +965,11 @@ void DumpImplement::CmdHelp()
         " dumpRawHeap and dumpLeakList under pid and tid\n"
         "  --mem-cjheap pid [--gc]     |the pid should belong to the Cangjie process; triggerGC and"
         " dumpHeapSnapshot under pid\n"
+<<<<<<< master
         "  --mem-heap pid ARG [--leakobj] [--raw] [-T tid] |ARG must be one of --native or --kmp-kotlin or --jsvm.\n"
+=======
+        "  --mem-heap pid ARG [--leakobj]  |ARG must be one of --native | --kotlin.\n"
+>>>>>>> master
         "  --ipc pid ARG               |ipc load statistic; pid must be specified or set to -a dump all"
         " processes. ARG must be one of --start-stat | --stop-stat | --stat\n";
 
@@ -1423,6 +1433,12 @@ bool DumpImplement::CheckDumpPermission(DumperOpts& opt)
 {
     bool isUserMode = DumpUtils::IsUserMode();
     DUMPER_HILOGD(MODULE_COMMON, "debug|isUserMode %{public}d", isUserMode);
+    if ((opt.isDumpFd_ || opt.isDumpThread_) && opt.processPid_ <= 0) {
+        SendErrorMessage(invalidError_ + "--fd/--thread requires -p PID");
+        DUMPER_HILOGE(MODULE_COMMON, "Fd/Thread dump requires pid, isUserMode:%{public}d, processPid_:%{public}d",
+            isUserMode, opt.processPid_);
+        return false;
+    }
     if (!isUserMode) {
         return true;
     }
