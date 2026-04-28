@@ -69,6 +69,7 @@ static struct option LONG_OPTIONS[] = {{"cpufreq", no_argument, 0, 0},
     {"mem-cjheap", required_argument, 0, 0},
     {"mem-heap", optional_argument, 0, 0},
     {"native", optional_argument, 0, 0},
+    {"kotlin", optional_argument, 0, 0},
     {"jsvm", optional_argument, 0, 0},
     {"gc", no_argument, 0, 0},
     {"leakobj", no_argument, 0, 0},
@@ -965,11 +966,7 @@ void DumpImplement::CmdHelp()
         " dumpRawHeap and dumpLeakList under pid and tid\n"
         "  --mem-cjheap pid [--gc]     |the pid should belong to the Cangjie process; triggerGC and"
         " dumpHeapSnapshot under pid\n"
-<<<<<<< master
-        "  --mem-heap pid ARG [--leakobj] [--raw] [-T tid] |ARG must be one of --native or --kmp-kotlin or --jsvm.\n"
-=======
-        "  --mem-heap pid ARG [--leakobj]  |ARG must be one of --native | --kotlin.\n"
->>>>>>> master
+        "  --mem-heap pid ARG [--leakobj] [--raw] [-T tid] |ARG must be one of --native or --kotlin or --jsvm.\n"
         "  --ipc pid ARG               |ipc load statistic; pid must be specified or set to -a dump all"
         " processes. ARG must be one of --start-stat | --stop-stat | --stat\n";
 
