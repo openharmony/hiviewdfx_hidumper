@@ -902,6 +902,45 @@ HWTEST_F(HiDumperManagerTest, DumpTest048, TestSize.Level0)
 }
 
 /**
+ * @tc.name: MemoryDumperTest49
+ * @tc.desc: Test dump statistic in /proc/pid/smaps has correct ret.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HiDumperManagerTest, DumpTest049, TestSize.Level0)
+{
+    char *argv[] = {
+        const_cast<char *>(TOOL_NAME.c_str()),
+        const_cast<char *>("--mem-heap"),
+        const_cast<char *>(std::to_string(getpid()).c_str()),
+        const_cast<char *>("--native"),
+        const_cast<char *>(""),
+    };
+    int argc = sizeof(argv) / sizeof(argv[0]) - 1;
+    int ret = GetDumpResult(argc, argv);
+    ASSERT_EQ(ret, DumpStatus::DUMP_OK);
+}
+
+/**
+ * @tc.name: MemoryDumperTest50
+ * @tc.desc: Test dump statistic in /proc/pid/smaps has correct ret.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HiDumperManagerTest, DumpTest050, TestSize.Level0)
+{
+    char *argv[] = {
+        const_cast<char *>(TOOL_NAME.c_str()),
+        const_cast<char *>("--mem-heap"),
+        const_cast<char *>(std::to_string(getpid()).c_str()),
+        const_cast<char *>("--native"),
+        const_cast<char *>("--leakobj"),
+        const_cast<char *>(""),
+    };
+    int argc = sizeof(argv) / sizeof(argv[0]) - 1;
+    int ret = GetDumpResult(argc, argv);
+    ASSERT_EQ(ret, DumpStatus::DUMP_OK);
+}
+
+/**
  * @tc.name: IpcStatDumpTest001
  * @tc.desc: hidumper --ipc -a --start-stat
  * @tc.type: FUNC
@@ -1206,6 +1245,42 @@ HWTEST_F(HiDumperManagerTest, FdThreadDumpTest006, TestSize.Level0)
     int argc = sizeof(argv) / sizeof(argv[0]) - 1;
     int ret = GetDumpResult(argc, argv);
     ASSERT_EQ(ret, DumpStatus::DUMP_FAIL);
+}
+
+/**
+ * @tc.name: FdThreadDumpTest007
+ * @tc.desc: Test --fd with -p but no PID argument should return DUMP_HELP.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HiDumperManagerTest, FdThreadDumpTest007, TestSize.Level0)
+{
+    char *argv[] = {
+        const_cast<char *>(TOOL_NAME.c_str()),
+        const_cast<char *>("-p"),
+        const_cast<char *>("--fd"),
+        const_cast<char *>(""),
+    };
+    int argc = sizeof(argv) / sizeof(argv[0]) - 1;
+    int ret = GetDumpResult(argc, argv);
+    ASSERT_EQ(ret, DumpStatus::DUMP_HELP);
+}
+
+/**
+ * @tc.name: FdThreadDumpTest008
+ * @tc.desc: Test --thread with -p but no PID argument should return DUMP_HELP.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HiDumperManagerTest, FdThreadDumpTest008, TestSize.Level0)
+{
+    char *argv[] = {
+        const_cast<char *>(TOOL_NAME.c_str()),
+        const_cast<char *>("-p"),
+        const_cast<char *>("--thread"),
+        const_cast<char *>(""),
+    };
+    int argc = sizeof(argv) / sizeof(argv[0]) - 1;
+    int ret = GetDumpResult(argc, argv);
+    ASSERT_EQ(ret, DumpStatus::DUMP_HELP);
 }
 } // namespace HiviewDFX
 } // namespace OHOS
