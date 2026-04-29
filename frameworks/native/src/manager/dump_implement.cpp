@@ -966,7 +966,7 @@ void DumpImplement::CmdHelp()
         " dumpRawHeap and dumpLeakList under pid and tid\n"
         "  --mem-cjheap pid [--gc]     |the pid should belong to the Cangjie process; triggerGC and"
         " dumpHeapSnapshot under pid\n"
-        "  --mem-heap pid ARG [--leakobj] [--raw] [-T tid] |ARG must be one of --native or --kotlin or --jsvm.\n"
+        "  --mem-heap pid ARG [--leakobj] [--raw] [-T tid] |ARG must be one of --native | --kotlin | --jsvm.\n"
         "  --ipc pid ARG               |ipc load statistic; pid must be specified or set to -a dump all"
         " processes. ARG must be one of --start-stat | --stop-stat | --stat\n";
 
