@@ -32,10 +32,13 @@ AppExecFwk::MemDumpType HeapMemoryDumper::DetermineDumpType(
 {
     bool isKotlin = parameter->GetOpts().isDumpHeapKotlin_;
     bool isNative = parameter->GetOpts().isDumpHeapNative_;
+    bool isJsvm = parameter->GetOpts().isDumpHeapJsvm_;
     if (isKotlin) {
         return AppExecFwk::MemDumpType::KMP_KOTLIN;
     } else if (isNative) {
         return AppExecFwk::MemDumpType::NATIVE;
+    } else if (isJsvm) {
+        return AppExecFwk::MemDumpType::JSVM;
     }
     return AppExecFwk::MemDumpType::INVALID;
 }
@@ -47,11 +50,13 @@ DumpStatus HeapMemoryDumper::PreExecute(const shared_ptr<DumperParameter> &param
         return DumpStatus::DUMP_FAIL;
     }
     needLeakobj_ = parameter->GetOpts().isDumpHeapLeakobj_;
+    needRaw_ = parameter->GetOpts().dumpRawHeap_;
     if (parameter->GetOpts().dumpHeapArgPid_ > 0) {
         pid_ = parameter->GetOpts().dumpHeapArgPid_;
     } else {
         pid_ = parameter->GetOpts().dumpHeapMemPid_;
     }
+    tid_ = parameter->GetOpts().threadId_;
     dumpDatas_ = dumpDatas;
     dumpType_ = DetermineDumpType(parameter);
     return DumpStatus::DUMP_OK;
@@ -61,8 +66,10 @@ DumpStatus HeapMemoryDumper::Execute()
 {
     OHOS::AppExecFwk::MemDumpInfo info;
     info.pid = pid_;
+    info.tid = tid_;
     info.dumpType = dumpType_;
     info.needLeakobj = needLeakobj_;
+    info.needRaw = needRaw_;
     info.mayReportToOEM = false;
 
     if (info.dumpType == AppExecFwk::MemDumpType::NATIVE && info.needLeakobj) {
