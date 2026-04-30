@@ -1389,6 +1389,9 @@ void DumpImplement::ReportMemheap(const DumperOpts &opts)
         strType = "hidumperNativeHeap";
     } else if (opts.isDumpHeapJsvm_) {
         strType = "hidumperJsvmHeap";
+        if (opts.dumpRawHeap_) {
+            strType = "hidumperJsvmRawHeap";
+        }
     } else {
         return;
     }
