@@ -71,7 +71,7 @@ declare_args() {
     hidumper_report_memmgr = true
   }
   hidumper_feature_support_usr_symlink = false
-  if (defined(global_parts_info.hmoshiviewdfx_programable_kernel_engine)) {
+  if (defined(global_parts_info.hmoshiviewdfx_profiler_ext)) {
     hidumper_hiviewdfx_plugin_enable = true
   }
 }
