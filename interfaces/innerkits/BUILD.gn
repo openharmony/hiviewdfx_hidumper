@@ -49,6 +49,7 @@ ohos_shared_library("lib_dump_usage") {
   deps = [ "${hidumper_service_path}:hidumper_client" ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "c_utils:utils",
     "hilog:libhilog",
     "hiview:libucollection_utility",
