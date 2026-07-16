@@ -26,6 +26,7 @@ config("hidumper_include") {
 }
 
 ohos_source_set("dump_main") {
+  branch_protector_ret = "pac_ret"
   sources = [
     "dump_utils.cpp",
     "src/common/dump_cfg.cpp",
@@ -166,6 +167,7 @@ ohos_source_set("dump_main") {
 }
 
 ohos_source_set("dump_framework") {
+  branch_protector_ret = "pac_ret"
   configs = [
     "${hidumper_utils_path}:utils_config",
     "${hidumper_service_path}:hidumpercpuservice_gen_config",
@@ -219,6 +221,7 @@ ohos_source_set("dump_framework") {
 }
 
 ohos_source_set("hidumperclient_source") {
+  branch_protector_ret = "pac_ret"
   sources = [
     "${hidumper_client_path}/native/dump_client_main.cpp",
     "dump_utils.cpp",
@@ -251,6 +254,7 @@ ohos_source_set("hidumperclient_source") {
 }
 
 ohos_shared_library("hidumperclient") {
+  branch_protector_ret = "pac_ret"
   install_enable = true
   deps = [ ":hidumperclient_source" ]
   external_deps = [ "hilog:libhilog" ]
@@ -260,6 +264,7 @@ ohos_shared_library("hidumperclient") {
 }
 
 ohos_executable("hidumper") {
+  branch_protector_ret = "pac_ret"
   install_enable = true
 
   sources = [ "${hidumper_client_path}/native/main.cpp" ]

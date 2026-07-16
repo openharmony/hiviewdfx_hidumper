@@ -20,6 +20,7 @@ config("innerkits_test_config") {
 }
 
 ohos_executable("innerkits_test") {
+  branch_protector_ret = "pac_ret"
   install_enable = true
 
   configs = [ ":innerkits_test_config" ]
