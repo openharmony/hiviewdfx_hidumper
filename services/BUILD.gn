@@ -98,6 +98,7 @@ ohos_source_set("zidl_client") {
 }
 
 ohos_source_set("zidl_service") {
+  branch_protector_ret = "pac_ret"
   sources = [ "zidl/src/dump_broker_stub.cpp" ]
 
   configs = [
@@ -122,6 +123,7 @@ ohos_source_set("zidl_service") {
 }
 
 ohos_source_set("zidl_cpu_service") {
+  branch_protector_ret = "pac_ret"
   output_values = get_target_outputs(":hidumpercpuservice_interface")
   sources = filter_include(output_values, [ "*service_stub.cpp" ])
 
@@ -185,6 +187,7 @@ ohos_shared_library("hidumper_client") {
 }
 
 ohos_source_set("hidumperservice_source") {
+  branch_protector_ret = "pac_ret"
   sources = [
     "native/src/dump_common_utils.cpp",
     "native/src/dump_cpu_data.cpp",
@@ -234,7 +237,8 @@ ohos_source_set("hidumperservice_source") {
 }
 
 ohos_shared_library("hidumperservice_cpu_source") {
-  if (hidumper_hiviewdfx_hiview_enable) {
+    branch_protector_ret = "pac_ret"
+    if (hidumper_hiviewdfx_hiview_enable) {
     public_configs = [ ":dump_cpu_config" ]
     sources = [
       "native/src/dump_cpu_data.cpp",
@@ -288,6 +292,7 @@ ohos_shared_library("hidumperservice_cpu_source") {
 }
 
 ohos_source_set("hidumperservice_cpu_source_test") {
+  branch_protector_ret = "pac_ret"
   sources = [ "native/src/dump_manager_cpu_service.cpp" ]
 
   configs = [
@@ -327,6 +332,7 @@ ohos_source_set("hidumperservice_cpu_source_test") {
 }
 
 ohos_shared_library("hidumperservice") {
+  branch_protector_ret = "pac_ret"
   deps = [ ":hidumperservice_source" ]
   external_deps = [ "hilog:libhilog" ]
   cflags = [ "-fstack-protector-strong" ]
@@ -338,6 +344,7 @@ ohos_shared_library("hidumperservice") {
 }
 
 ohos_source_set("hidumpermemory_source") {
+  branch_protector_ret = "pac_ret"
   sources = [
     "${hidumper_frameworks_path}/dump_utils.cpp",
     "${hidumper_frameworks_path}/src/common/dump_cfg.cpp",
@@ -411,6 +418,7 @@ ohos_source_set("hidumpermemory_source") {
 }
 
 ohos_shared_library("hidumpermemory") {
+  branch_protector_ret = "pac_ret"
   deps = [ ":hidumpermemory_source" ]
   external_deps = [ "hilog:libhilog" ]
   install_enable = true
@@ -421,6 +429,7 @@ ohos_shared_library("hidumpermemory") {
 
 if (hidumper_hiviewdfx_hiview_enable) {
   ohos_shared_library("hidumpercpuservice") {
+    branch_protector_ret = "pac_ret"
     deps = [ ":hidumperservice_cpu_source" ]
     external_deps = [ "hilog:libhilog" ]
     install_enable = true
