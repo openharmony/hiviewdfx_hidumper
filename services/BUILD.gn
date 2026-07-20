@@ -238,7 +238,7 @@ ohos_source_set("hidumperservice_source") {
 
 ohos_shared_library("hidumperservice_cpu_source") {
     branch_protector_ret = "pac_ret"
-    if (hidumper_hiviewdfx_hiview_enable) {
+  if (hidumper_hiviewdfx_hiview_enable) {
     public_configs = [ ":dump_cpu_config" ]
     sources = [
       "native/src/dump_cpu_data.cpp",
