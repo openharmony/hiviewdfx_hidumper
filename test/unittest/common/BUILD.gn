@@ -66,6 +66,7 @@ ohos_unittest("HidumperServiceTest") {
   deps = [ "${hidumper_service_path}:hidumperservice_source" ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "hilog:libhilog",
@@ -224,6 +225,7 @@ ohos_unittest("MemoryDumperTest") {
   deps = [ "${hidumper_service_path}:hidumperservice_source" ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "c_utils:utils",
     "drivers_interface_memorytracker:libmemorytracker_proxy_1.0",
     "hdf_core:libhdf_utils",
@@ -332,6 +334,7 @@ ohos_unittest("HidumperInnerkitsTest") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "c_utils:utils",
     "drivers_interface_memorytracker:libmemorytracker_proxy_1.0",
     "hdf_core:libhdf_utils",

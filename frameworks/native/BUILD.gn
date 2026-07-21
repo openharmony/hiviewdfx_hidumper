@@ -114,6 +114,7 @@ ohos_source_set("dump_main") {
   external_deps = [
     "ability_base:configuration",
     "ability_base:want",
+    "bounds_checking_function:libsec_shared",
     "cJSON:cjson",
     "c_utils:utils",
     "hdf_core:libhdi",
@@ -206,6 +207,7 @@ ohos_source_set("dump_framework") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "cJSON:cjson",
     "c_utils:utils",
     "ffrt:libffrt",
@@ -241,6 +243,7 @@ ohos_source_set("hidumperclient_source") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "hilog:libhilog",

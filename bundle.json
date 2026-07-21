@@ -26,6 +26,7 @@
                 "ability_base",
                 "access_token",
                 "bundle_framework",
+                "bounds_checking_function",
                 "c_utils",
                 "eventhandler",
                 "hilog",
