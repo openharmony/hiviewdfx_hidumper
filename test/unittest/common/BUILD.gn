@@ -79,39 +79,6 @@ ohos_unittest("HidumperServiceTest") {
   ]
 }
 
-ohos_unittest("HidumperDataInventoryTest") {
-  module_out_path = module_output_path
-
-  sources = [
-    "data_inventory_test.cpp",
-  ]
-
-  deps = [
-    "${hidumper_frameworks_path}:dump_framework"
-  ]
-
-  configs = [
-    "${hidumper_frameworks_path}:hidumper_include",
-    "${hidumper_utils_path}:utils_config",
-  ]
-
-  cflags = [
-    "-Dprivate=public",  #allow test code access private members
-  ]
-
-  external_deps = [
-    "c_utils:utils",
-    "ffrt:libffrt",
-    "hilog:libhilog",
-    "hiview:libucollection_utility",
-    "init:libbegetutil",
-    "ipc:ipc_core",
-    "memmgr:memmgrclient",
-    "samgr:samgr_proxy",
-    "cJSON:cjson",
-  ]
-}
-
 ohos_unittest("HidumperDumpersTest") {
   module_out_path = module_output_path
 
@@ -143,28 +110,6 @@ ohos_unittest("HidumperDumpersTest") {
     external_deps += [ "ability_runtime:app_manager" ]
     defines += [ "HIDUMPER_ABILITY_RUNTIME_ENABLE" ]
   }
-}
-
-ohos_unittest("StorageInfoTaskTest") {
-  module_out_path = module_output_path
-
-  sources = [ "storage_info_task_test.cpp" ]
-
-  deps = [ "${hidumper_frameworks_path}:dump_framework" ]
-
-  configs = [
-    "${hidumper_frameworks_path}:hidumper_include",
-    "${hidumper_utils_path}:utils_config",
-  ]
-
-  cflags = [
-    "-Dprivate=public",  #allow test code access private members
-  ]
-
-  external_deps = [
-    "c_utils:utils",
-    "hilog:libhilog",
-  ]
 }
 
 ohos_unittest("HidumperOutputTest") {
@@ -261,7 +206,6 @@ ohos_unittest("HidumperMemoryTest") {
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "memory_utils:libmeminfo",
-    "samgr:samgr_proxy",
   ]
   defines = []
   if (hidumper_report_memmgr) {
@@ -567,7 +511,6 @@ group("unittest") {
     ":GetHeapInfoTest",
     ":HidumperClientTest",
     ":HidumperConfigUtilsTest",
-    ":HidumperDataInventoryTest",
     ":HidumperDumpersTest",
     ":HidumperInnerkitsTest",
     ":HidumperManagerTest",
@@ -579,7 +522,6 @@ group("unittest") {
     ":ZipFileCleanerTest",
     ":MemoryDumperTest",
     ":SADumperTest",
-    ":StorageInfoTaskTest",
   ]
 
   if (hidumper_hiviewdfx_hiview_enable) {
