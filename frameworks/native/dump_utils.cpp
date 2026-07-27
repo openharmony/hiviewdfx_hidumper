@@ -249,6 +249,7 @@ inline const std::map<int, std::string> saNameMap_ = {
     { FUSION_RANGING_SYS_ABILITY_ID, "FusionRanging" },
     { DISK_MANAGER_SA_ID, "DiskManager" },
     { MIDI_SERVICE_ID, "MidiService" },
+    { ASSESSMENT_SERVICE_ID, "AssessmentConfigurationService" }
 };
 
 namespace HiviewDFX {
