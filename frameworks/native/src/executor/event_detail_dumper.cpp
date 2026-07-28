@@ -141,9 +141,9 @@ void EventDetailDumper::ReadSingleLogFile(const std::string &path)
         return;
     }
     fp_ = fdopen(fd_, "r");
-    fdsan_exchange_owner_tag(fd_, 0, FDTAG);
     if (fp_ == nullptr) {
         DUMPER_HILOGE(MODULE_COMMON, "logPaths fdopen failed");
+        fdsan_exchange_owner_tag(fd_, 0, FDTAG);
         fdsan_close_with_tag(fd_, FDTAG);
         fd_ = -1;
         return;
@@ -185,12 +185,12 @@ DumpStatus EventDetailDumper::AfterExecute()
 
 void EventDetailDumper::CloseFd()
 {
-    fdsan_exchange_owner_tag(fd_, 0, FDTAG);
     if (fp_ != nullptr) {
         fclose(fp_);
         fp_ = nullptr;
         fd_ = -1;
     } else if (fd_ >= 0) {
+        fdsan_exchange_owner_tag(fd_, 0, FDTAG);
         fdsan_close_with_tag(fd_, FDTAG);
         fd_ = -1;
     }

@@ -36,8 +36,8 @@ ZipFolderOutput::ZipFolderOutput() : fd_(FD_UNSET)
 ZipFolderOutput::~ZipFolderOutput()
 {
     DUMPER_HILOGD(MODULE_COMMON, "release|");
-    fdsan_exchange_owner_tag(fd_, 0, FDTAG);
     if (fd_ > FD_UNSET) {
+        fdsan_exchange_owner_tag(fd_, 0, FDTAG);
         fdsan_close_with_tag(fd_, FDTAG);
     }
 
@@ -118,9 +118,9 @@ DumpStatus ZipFolderOutput::AfterExecute()
 
 void ZipFolderOutput::Reset()
 {
-    fdsan_exchange_owner_tag(fd_, 0, FDTAG);
     if (fd_ > FD_UNSET) {
         DUMPER_HILOGD(MODULE_COMMON, "Reset debug|close");
+        fdsan_exchange_owner_tag(fd_, 0, FDTAG);
         fdsan_close_with_tag(fd_, FDTAG);
     }
     fd_ = FD_UNSET;
