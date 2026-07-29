@@ -34,6 +34,7 @@ private:
     int32_t RequestFileFdStub(MessageParcel& data, MessageParcel& reply);
     int32_t ScanPidOverLimitStub(MessageParcel& data, MessageParcel& reply);
     int32_t CountFdNumsStub(MessageParcel& data, MessageParcel& reply);
+    int32_t ScanOrphanVnodeOverLimitStub(MessageParcel& data, MessageParcel& reply);
 };
 } // namespace HiviewDFX
 } // namespace OHOS

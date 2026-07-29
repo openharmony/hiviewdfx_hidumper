@@ -32,6 +32,14 @@ class RawParam;
 using DumpManagerServiceTestMainFunc = std::function<void(int argc, char *argv[],
     const std::shared_ptr<RawParam>& reqCtl)>;
 #endif // for mock test
+
+struct OrphanVnodeInfo {
+    int32_t pid;
+    int32_t fdNum;
+    std::string processName;
+    std::vector<std::pair<std::string, int32_t>> topLinks;
+};
+
 class DumpManagerService final : public SystemAbility, public DumpBrokerStub {
     DECLARE_SYSTEM_ABILITY(DumpManagerService)
 public:
@@ -48,7 +56,10 @@ public:
     int32_t ScanPidOverLimit(std::string requestType, int32_t limitSize, std::vector<int32_t> &pidList) override;
     // Used for count fd nums
     int32_t CountFdNums(int32_t pid, uint32_t &fdNums, std::string &detailFdInfo,
-        std::vector<std::string> &topLeakedTypeList) override;
+                        std::vector<std::string> &topLeakedTypeList) override;
+    // Used for scan orphan vnode over limit
+    int32_t ScanOrphanVnodeOverLimit(int32_t fdLeakThreshold, int32_t orphanVnodeThreshold,
+                                     std::vector<std::string> &topOrphanVnodeInfoList) override;
 public:
     int32_t OnIdle(const SystemAbilityOnDemandReason& idleReason) override;
     int32_t Dump(int32_t fd, const std::vector<std::u16string>& args) override;
@@ -78,14 +89,17 @@ private:
     std::vector<std::string> GetFdLinks(int pid);
     std::string MaybeKnownType(const std::string &link);
     std::unordered_map<std::string, int> CountPaths(const std::vector<std::string>& links);
-    std::vector<std::pair<std::string, int>> TopN(const std::unordered_map<std::string, int>& counter, size_t n);
+    std::vector<std::pair<std::string, int>> TopN(const std::unordered_map<std::string, int>& counter, size_t n) const;
     std::string GetSummary(const std::vector<std::pair<std::string, int>> &topLinks,
                            const std::vector<std::pair<std::string, int>> &topTypes);
     std::string GetTopFdInfo(const std::vector<std::pair<std::string, int>> &topLinks);
     std::string GetTopDirInfo(const std::vector<std::pair<std::string, int>> &topTypes,
                               const std::map<std::string, std::unordered_map<std::string, int>> &typePaths);
     void HandleRequestError(std::vector<std::u16string> &args, int outfd,
-        const int32_t& errorCode, const std::string& errorMsg);
+                            const int32_t& errorCode, const std::string& errorMsg);
+    bool ScanOrphanVnodesForProcess(int32_t pid, int32_t orphanVnodeThreshold,
+                                    std::vector<std::pair<std::string, int32_t>>& topLinks) const;
+    void FormatOrphanVnodeInfo(const OrphanVnodeInfo& info, std::string& output) const;
 private:
     std::mutex mutex_;
     std::shared_ptr<AppExecFwk::EventRunner> eventRunner_;

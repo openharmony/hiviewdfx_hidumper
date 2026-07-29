@@ -44,6 +44,11 @@ int DumpBrokerStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageP
             ret = CountFdNumsStub(data, reply);
             break;
         }
+        case static_cast<int>(HidumperServiceInterfaceCode::SCAN_ORPHAN_VNODE_OVER_LIMIT): {
+            DUMPER_HILOGD(MODULE_ZIDL, "debug|ScanOrphanVnodeOverLimitStub");
+            ret = ScanOrphanVnodeOverLimitStub(data, reply);
+            break;
+        }
         default: {
             ret = IPCObjectStub::OnRemoteRequest(code, data, reply, option);
             break;
@@ -102,6 +107,24 @@ int32_t DumpBrokerStub::CountFdNumsStub(MessageParcel& data, MessageParcel& repl
         return ERROR_WRITE_PARCEL;
     }
     if (!reply.WriteStringVector(topLeakedTypeList)) {
+        return ERROR_WRITE_PARCEL;
+    }
+    if (!reply.WriteInt32(ret)) {
+        return ERROR_WRITE_PARCEL;
+    }
+    return ret;
+}
+
+int32_t DumpBrokerStub::ScanOrphanVnodeOverLimitStub(MessageParcel& data, MessageParcel& reply)
+{
+    int32_t ret = ERR_OK;
+    std::vector<std::string> topOrphanVnodeInfoList;
+
+    int32_t fdLeakThreshold = data.ReadInt32();
+    int32_t orphanVnodeThreshold = data.ReadInt32();
+    ret = ScanOrphanVnodeOverLimit(fdLeakThreshold, orphanVnodeThreshold, topOrphanVnodeInfoList);
+
+    if (!reply.WriteStringVector(topOrphanVnodeInfoList)) {
         return ERROR_WRITE_PARCEL;
     }
     if (!reply.WriteInt32(ret)) {

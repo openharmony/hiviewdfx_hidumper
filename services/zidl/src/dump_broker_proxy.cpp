@@ -116,5 +116,37 @@ int32_t DumpBrokerProxy::CountFdNums(int32_t pid, uint32_t &fdNums,
     DUMPER_HILOGI(MODULE_ZIDL, "sucess to count fd nums, pid is %{public}d", pid);
     return ret;
 }
+
+int32_t DumpBrokerProxy::ScanOrphanVnodeOverLimit(int32_t fdLeakThreshold, int32_t orphanVnodeThreshold,
+                                                  std::vector<std::string> &topOrphanVnodeInfoList)
+{
+    int32_t ret = -1;
+    sptr<IRemoteObject> remote = Remote();
+    if (remote == nullptr) {
+        return ret;
+    }
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(DumpBrokerProxy::GetDescriptor())) {
+        return ret;
+    }
+    data.WriteInt32(fdLeakThreshold);
+    data.WriteInt32(orphanVnodeThreshold);
+    MessageParcel reply;
+    MessageOption option;
+    int res = remote->SendRequest(static_cast<int>(HidumperServiceInterfaceCode::SCAN_ORPHAN_VNODE_OVER_LIMIT),
+        data, reply, option);
+    if (res != ERR_OK) {
+        DUMPER_HILOGE(MODULE_ZIDL, "send ScanOrphanVnodeOverLimit error code: %{public}d.", res);
+        return ret;
+    }
+    if (!reply.ReadStringVector(&topOrphanVnodeInfoList)) {
+        return ERROR_READ_PARCEL;
+    }
+    if (!reply.ReadInt32(ret)) {
+        return ERROR_READ_PARCEL;
+    }
+    DUMPER_HILOGI(MODULE_ZIDL, "success to scan orphan vnode over limit");
+    return ret;
+}
 } // namespace HiviewDFX
 } // namespace OHOS
