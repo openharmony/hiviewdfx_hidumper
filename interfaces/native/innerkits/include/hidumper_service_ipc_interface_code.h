@@ -21,7 +21,8 @@ namespace HiviewDFX {
 enum class HidumperServiceInterfaceCode {
     DUMP_REQUEST_FILEFD,
     SCAN_PID_OVER_LIMIT,
-    COUNT_FD_NUMS
+    COUNT_FD_NUMS,
+    SCAN_ORPHAN_VNODE_OVER_LIMIT
 };
 } // namespace HiviewDFX
 } // namespace OHOS
