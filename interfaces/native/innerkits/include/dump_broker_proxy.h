@@ -32,7 +32,10 @@ public:
     int32_t ScanPidOverLimit(std::string requestType, int32_t limitSize, std::vector<int32_t> &pidList) override;
     // Used for count fd nums
     int32_t CountFdNums(int32_t pid, uint32_t &fdNums, std::string &detailFdInfo,
-        std::vector<std::string> &topLeakedTypeList) override;
+                        std::vector<std::string> &topLeakedTypeList) override;
+    // Used for scan orphan vnode over limit
+    int32_t ScanOrphanVnodeOverLimit(int32_t fdLeakThreshold, int32_t orphanVnodeThreshold,
+                                     std::vector<std::string> &topOrphanVnodeInfoList) override;
 private:
     static inline BrokerDelegator<DumpBrokerProxy> delegator_;
 };

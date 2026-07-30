@@ -26,6 +26,8 @@
 #include <queue>
 #include <unistd.h>
 #include <sys/stat.h>
+#include <fcntl.h>
+#include <fstream>
 
 #include "common.h"
 #include "common/dumper_constant.h"
@@ -55,6 +57,8 @@ constexpr int32_t DYNAMIC_EXIT_DELAY_TIME = 120000;
 constexpr int32_t UNLOAD_IMMEDIATELY = 0;
 constexpr size_t FD_TOP_CNT = 10;
 constexpr int32_t NEED_DUMP_FDLINK_NUMS = 1200;
+constexpr size_t ORPHAN_FD_TOP_CNT = 3;
+constexpr size_t ORPHAN_FDLINKPATH_TOP_CNT = 10;
 }
 
 DumpManagerService::DumpManagerService() : SystemAbility(DFX_SYS_HIDUMPER_ABILITY_ID, true)
@@ -297,7 +301,7 @@ unordered_map<string, int> DumpManagerService::CountPaths(const vector<string>& 
     return counter;
 }
 
-vector<pair<string, int>> DumpManagerService::TopN(const unordered_map<string, int>& counter, size_t n)
+vector<pair<string, int>> DumpManagerService::TopN(const unordered_map<string, int>& counter, size_t n) const
 {
     using Entry = pair<string, int>;
 
@@ -425,6 +429,114 @@ int32_t DumpManagerService::CountFdNums(int32_t pid, uint32_t &fdNums, std::stri
     detailFdInfo = output.str();
 
     return DumpStatus::DUMP_OK;
+}
+
+int32_t DumpManagerService::ScanOrphanVnodeOverLimit(int32_t fdLeakThreshold, int32_t orphanVnodeThreshold,
+                                                     std::vector<std::string> &topOrphanVnodeInfoList)
+{
+    DUMPER_HILOGE(MODULE_SERVICE, "fdLeakThreshold: %{public}d, orphanVnodeThreshold: %{public}d",
+                  fdLeakThreshold, orphanVnodeThreshold);
+    if (!HasDumpPermission()) {
+        return DumpStatus::DUMP_FAIL;
+    }
+    if (fdLeakThreshold < 0 || orphanVnodeThreshold < 0) {
+        return DumpStatus::DUMP_FAIL;
+    }
+
+    std::vector<OrphanVnodeInfo> tempResults;
+    std::vector<int32_t> pids = DumpCommonUtils::GetAllPids();
+    for (const auto &pid : pids) {
+        uint32_t fdNums = GetFileDescriptorNums(pid, "fd");
+        if (fdNums < fdLeakThreshold) {
+            continue;
+        }
+        std::vector<std::pair<std::string, int32_t>> topLinks;
+        if (ScanOrphanVnodesForProcess(pid, orphanVnodeThreshold, topLinks)) {
+            OrphanVnodeInfo info;
+            info.pid = pid;
+            info.fdNum = fdNums;
+            DumpCommonUtils::GetProcessNameByPid(pid, info.processName);
+            info.topLinks = topLinks;
+            tempResults.push_back(info);
+        }
+    }
+    std::sort(tempResults.begin(), tempResults.end(),
+        [](const auto& a, const auto& b) {
+            return a.fdNum > b.fdNum;
+        });
+
+    size_t topProcessCount = std::min(tempResults.size(), static_cast<size_t>(ORPHAN_FD_TOP_CNT));
+    for (size_t i = 0; i < topProcessCount; ++i) {
+        std::string output;
+        FormatOrphanVnodeInfo(tempResults[i], output);
+        topOrphanVnodeInfoList.push_back(output);
+    }
+    return DumpStatus::DUMP_OK;
+}
+
+bool DumpManagerService::ScanOrphanVnodesForProcess(int32_t pid, int32_t orphanVnodeThreshold,
+    std::vector<std::pair<std::string, int32_t>>& topLinks) const
+{
+    int32_t orphanVnodeCount = 0;
+    std::vector<std::string> orphanVnodeLinks;
+    std::string fdPath = "/proc/" + std::to_string(pid) + "/fd/";
+    std::vector<std::string> fdNodes = DumpCommonUtils::GetSubNodes(fdPath, true);
+
+    for (const auto &fdNode : fdNodes) {
+        std::string linkPath = fdPath + fdNode;
+        std::string linkDest = GetFdLink(linkPath);
+        if (linkDest == "unknown") {
+            continue;
+        }
+        struct stat statBuf;
+        // orphan vnode check
+        if (stat(linkDest.c_str(), &statBuf) != 0) {
+            orphanVnodeCount++;
+            if (linkDest.find("/data") == 0) {
+                orphanVnodeLinks.push_back(linkDest);
+            }
+        }
+    }
+
+    if (orphanVnodeCount <= orphanVnodeThreshold) {
+        return false;
+    }
+
+    std::unordered_map<std::string, int32_t> linkCounts;
+    for (const auto& link : orphanVnodeLinks) {
+        ++linkCounts[link];
+    }
+
+    std::unordered_map<std::string, int32_t> typeTotal;
+    for (const auto& [path, count] : linkCounts) {
+        std::string type(path, 0, DumpCommonUtils::FindFdClusterStartIndex(path));
+        if (type != path) {
+            typeTotal[type] += count;
+        }
+    }
+    for (const auto& [type, total] : typeTotal) {
+        linkCounts[type] = total;
+    }
+
+    topLinks = TopN(linkCounts, ORPHAN_FDLINKPATH_TOP_CNT);
+    return true;
+}
+
+void DumpManagerService::FormatOrphanVnodeInfo(const OrphanVnodeInfo& info, std::string& output) const
+{
+    std::stringstream ss;
+    ss << "pid: " << info.pid << "\n";
+    ss << "fdNum: " << info.fdNum << "\n";
+    if (!info.processName.empty()) {
+        ss << "processName: " << info.processName << "\n";
+    }
+
+    ss << "\nOrphan Vnode Top10\n";
+    for (const auto& [path, count] : info.topLinks) {
+        ss << path << " " << count << "\n";
+    }
+
+    output = ss.str();
 }
 
 #ifdef DUMP_TEST_MODE // for mock test
