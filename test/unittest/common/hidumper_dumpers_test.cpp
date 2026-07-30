@@ -1278,7 +1278,11 @@ HWTEST_F(HidumperDumpersTest, ArkwebJsHeapDumperTest001, TestSize.Level1)
     std::vector<std::u16string> args;
     std::shared_ptr<RawParam> rawParam = std::make_shared<RawParam>(0, 1, 0, args, -1);
     int ret = DumpImplement::GetInstance().Main(argc, argv, rawParam);
+#ifdef HIDUMPER_HIVIEWDFX_PLUGIN_ENABLE
     ASSERT_EQ(ret, DumpStatus::DUMP_HELP);
+#else
+    ASSERT_EQ(ret, DumpStatus::DUMP_INVALID_ARG);
+#endif
 }
 
 /**
@@ -1299,7 +1303,11 @@ HWTEST_F(HidumperDumpersTest, ArkwebJsHeapDumperTest003, TestSize.Level1)
     std::vector<std::u16string> args;
     std::shared_ptr<RawParam> rawParam = std::make_shared<RawParam>(0, 1, 0, args, -1);
     int ret = DumpImplement::GetInstance().Main(argc, argv, rawParam);
+#ifdef HIDUMPER_HIVIEWDFX_PLUGIN_ENABLE
     ASSERT_EQ(ret, DumpStatus::DUMP_HELP);
+#else
+    ASSERT_EQ(ret, DumpStatus::DUMP_INVALID_ARG);
+#endif
 }
 
 /**
@@ -1320,7 +1328,11 @@ HWTEST_F(HidumperDumpersTest, ArkwebJsHeapDumperTest004, TestSize.Level1)
     std::vector<std::u16string> args;
     std::shared_ptr<RawParam> rawParam = std::make_shared<RawParam>(0, 1, 0, args, -1);
     int ret = DumpImplement::GetInstance().Main(argc, argv, rawParam);
+#ifdef HIDUMPER_HIVIEWDFX_PLUGIN_ENABLE
     ASSERT_EQ(ret, DumpStatus::DUMP_HELP);
+#else
+    ASSERT_EQ(ret, DumpStatus::DUMP_INVALID_ARG);
+#endif
 }
 
 /**
@@ -1342,7 +1354,11 @@ HWTEST_F(HidumperDumpersTest, ArkwebJsHeapDumperTest005, TestSize.Level1)
     std::vector<std::u16string> args;
     std::shared_ptr<RawParam> rawParam = std::make_shared<RawParam>(0, 1, 0, args, -1);
     int ret = DumpImplement::GetInstance().Main(argc, argv, rawParam);
+#ifdef HIDUMPER_HIVIEWDFX_PLUGIN_ENABLE
     ASSERT_EQ(ret, DumpStatus::DUMP_HELP);
+#else
+    ASSERT_EQ(ret, DumpStatus::DUMP_INVALID_ARG);
+#endif
 }
 
 /**
