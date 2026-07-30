@@ -44,7 +44,12 @@ public:
         return 0;
     }
     int32_t CountFdNums(int32_t pid, uint32_t &fdNums, std::string &detailFdInfo,
-        std::vector<std::string> &topLeakedTypeList)
+                        std::vector<std::string> &topLeakedTypeList)
+    {
+        return 0;
+    }
+    int32_t ScanOrphanVnodeOverLimit(int32_t fdLeakThreshold, int32_t orphanVnodeThreshold,
+                                     std::vector<std::string> &topOrphanVnodeInfoList)
     {
         return 0;
     }
@@ -86,9 +91,13 @@ HWTEST_F(HidumperZidlTest, HidumperZidlTest001, TestSize.Level3)
     ret = stub->OnRemoteRequest(static_cast<uint32_t>(HidumperServiceInterfaceCode::COUNT_FD_NUMS),
         data, reply, option);
     ASSERT_TRUE(ret != 0);
+    ret = stub->OnRemoteRequest(static_cast<uint32_t>(HidumperServiceInterfaceCode::SCAN_ORPHAN_VNODE_OVER_LIMIT),
+        data, reply, option);
+    ASSERT_TRUE(ret != 0);
     stub->RequestFileFdStub(data, reply);
     stub->ScanPidOverLimitStub(data, reply);
     stub->CountFdNumsStub(data, reply);
+    stub->ScanOrphanVnodeOverLimitStub(data, reply);
 }
 } // namespace HiviewDFX
 } // namespace OHOS
