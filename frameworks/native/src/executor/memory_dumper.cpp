@@ -29,6 +29,7 @@ MemoryDumper::MemoryDumper()
 MemoryDumper::~MemoryDumper()
 {
     if (isZip_ && rawParamFd_ >= 0) {
+        fdsan_exchange_owner_tag(rawParamFd_, 0, FDTAG);
         fdsan_close_with_tag(rawParamFd_, FDTAG);
         rawParamFd_ = -1;
     }
