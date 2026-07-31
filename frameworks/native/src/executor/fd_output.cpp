@@ -29,6 +29,7 @@ FDOutput::FDOutput() : fd_(-1)
 FDOutput::~FDOutput()
 {
     if (fd_ >= 0) {
+        fdsan_exchange_owner_tag(fd_, 0, FDTAG);
         fdsan_close_with_tag(fd_, FDTAG);
     }
     fd_ = -1;
