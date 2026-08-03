@@ -40,6 +40,7 @@ SADumper::SADumper(void)
 SADumper::~SADumper(void)
 {
     if (isZip_ && outputFd_ >= 0) {
+        fdsan_exchange_owner_tag(outputFd_, 0, FDTAG);
         fdsan_close_with_tag(outputFd_, FDTAG);
         outputFd_ = -1;
     }
