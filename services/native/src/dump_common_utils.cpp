@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "dump_common_utils.h"
+#include "parse_dump_int.h"
 #include <fcntl.h>
 #include <file_ex.h>
 #include <securec.h>
@@ -108,10 +109,11 @@ std::vector<int32_t> DumpCommonUtils::GetAllPids()
     std::vector<int32_t> pids;
     std::vector<std::string> allPids = GetSubDir(path, true);
     for (const auto &pid : allPids) {
-        if (!IsNumericStr(pid)) {
+        int32_t parsed = 0;
+        if (!ParseDumpInt32(pid, parsed)) {
             continue;
         }
-        pids.push_back(std::stoi(pid));
+        pids.push_back(parsed);
     }
     return pids;
 }
